@@ -1,0 +1,116 @@
+<nav class="navbar navbar-expand-lg " style="background-color: #9B1313;"> 
+  <div class="container-fluid d-flex align-items-center justify-content-center">
+    
+    <!-- Left Side: Toggle Button -->
+    <button class="navbar-toggler mx-start" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Logo (Centered) -->
+    <a class="navbar-brand mx-start" href="#">
+      <img src="assets/logo.png" alt="General Store/Oil"  />
+    </a>
+
+    <!-- Right Side: User & Cart Icons (Mobile View Only) -->
+     
+    <div class="d-flex d-lg-none ">
+      <a href="/profile" class="me-3 text-light">
+        <i class="bi bi-heart text-light fs-4" ></i>
+      </a>
+      <a href="/profile" class="me-3 text-light" style="color: wheat;">
+        <i class="bi bi-person fs-4"></i>
+      </a>
+      <a href="/cart" class="me-3 text-light">
+        <i class="bi bi-cart fs-4"></i>
+      </a>
+    </div>
+ 
+
+  <!-- Collapsible Menu (Nav Items + Search Bar + Icons for Desktop) -->
+  <div class="collapse navbar-collapse " id="navbarSupportedContent"  >
+    <ul class="navbar-nav align-items-center me-auto mb-3 mb-lg-0 " style="color:aliceblue;">
+      <li class="nav-item">
+        <a class="nav-link text-light active" aria-current="page" routerLink="/products" routerLinkActive="active">Product</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-light active" routerLink="/inventory" routerLinkActive="active">Inventory</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-light active" routerLink="/orders" routerLinkActive="active">Order List</a>
+      </li>
+    </ul>
+
+    <!-- Search Bar & Icons (For Desktop) -->
+    <div class="d-flex align-items-center justify-content-center">
+      <form class="d-flex me-3" role="search">
+        <input class="form-control me-2" type="search" name="term" placeholder="Search" aria-label="Search">
+      </form>
+      
+      <!-- Icons (Visible only on Large Screens) -->
+      <div class="d-none d-lg-flex">
+        
+        <a routerLink="/wishlist" class="me-3 text-light position-relative">
+          <i class="bi bi-heart text-light fs-4" >
+            <span *ngIf="wishlistCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:10px">
+            {{wishlistCount}}
+            <span class="visually-hidden">unread messages</span>
+          </span>
+        </i>
+        </a>
+        <a href="/profile" class="text-white me-3">
+          <i class="bi bi-person fs-4"> 
+        </i>
+        </a>
+        <a routerLink="/cart" class=" me-3 text-light position-relative">
+          <i class="bi bi-cart fs-4">
+            <span *ngIf="cartCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:10px">
+              {{cartCount}}
+              <span class="visually-hidden">unread messages</span>
+            </span>
+          </i>
+        </a>
+      </div>
+    </div>
+  </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>
+
+<!-- Footer Section -->
+<footer class="text-light text-center py-3 border-bottom mt-5" style="background-color:#38000A; color:#CD1C18">
+  <div class="container">
+    <div class="row">
+      <!-- Company Info -->
+      <div class="col-md-4 mb-3">
+        <h5  style="color: #CD1C18; " >ShopEase</h5>
+        <p class="small">Your one-stop destination for quality products.</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="col-md-4 mb-3">
+        <h5 class="text-danger">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-light text-decoration-none">Home</a></li>
+          <li><a href="#" class="text-light text-decoration-none">Shop</a></li>
+          <li><a href="#" class="text-light text-decoration-none">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div class="col-md-4 mb-3">
+        <h5 class="text-danger">Follow Us</h5>
+        <a href="#" class="text-light mx-2"><i class="fab fa-facebook"></i></a>
+        <a href="#" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="text-light mx-2"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+    
+    <!-- Copyright -->
+    <div class="mt-3">
+      <p class="small mb-0">&copy; 2025 ShopEase. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+

@@ -1,0 +1,31 @@
+/* You can add global styles to this file, and also import other style files */
+@use "bootstrap/scss/bootstrap" as *;
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    // background-color: #49fcd4;
+    background-color: #ffffff;
+    // background-image:  linear-gradient(45deg, #726193 20%, #e37b7c 60%, #ffe4b4);
+    background-image:  linear-gradient(45deg, #FFFFFF 20%, #D4D4D4 60%, #ffe4b4);
+    // background-image: url('assets/leaves.png');
+    background-size: 200% auto; 
+    // background-attachment: fixed;
+    background-size: center;
+    animation: bg-pan-left 8s infinite alternate ease-in-out;
+}
+.custom-scroll{
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.custom-scroll::-webkit-scrollbar{
+display: none;
+}
+.bg-pan-left{-webkit-animation:bg-pan-left 8s both;animation:bg-pan-left 8s both}
+
+
+ @-webkit-keyframes bg-pan-left{0%{background-position:100% 50%}100%{background-position:0 50%}}@keyframes bg-pan-left{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+

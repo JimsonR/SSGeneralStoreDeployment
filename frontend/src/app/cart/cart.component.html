@@ -1,0 +1,42 @@
+<div class="container mt-4">
+    <h2 class="mb-4">Shopping Cart</h2>
+
+    <div *ngIf="cartItems.length === 0" class="alert alert-info">
+        Your cart is empty.
+    </div>
+
+    <div *ngFor="let item of cartItems" class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-2">
+                <img [src]="'http://localhost:8080'+item.productImg" alt="{{ item.productName }}" class="img-fluid rounded-start">
+            </div>
+
+            <div class="col-md-10">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title">{{ item.productName }}</h5>
+
+                        <!-- Quantity Controls at the Top Right -->
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-danger" (click)="decreaseQuantity(item.productId)"><i class="bi bi-dash-lg"></i></button>
+                            <span class="mx-2 fs-5">{{ item.quantity }}</span>
+                            <button class="btn btn-sm btn-danger" (click)="increaseQuantity(item.productId)"><i class="bi bi-plus-lg"></i></button>
+                        </div>
+                    </div>
+
+                    <p class="card-text">Price: ₹{{ item.productPrice }}</p>
+                </div>
+
+                <!-- Remove Button Aligned to Bottom Right -->
+                <div class="d-flex justify-content-end mb-2 me-3">
+                    <button class="btn btn-danger" (click)="removeItem(item.productId)">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end mt-4">
+        <h4>Total: ₹{{ getTotalPrice() }}</h4>
+        <button class="btn btn-warning" (click)="clearCart()">Clear Cart</button>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+<h2> My wishlist ({{wishlistItems.length}})</h2>
+<div class="container mt-4">
+<div *ngIf="wishlistItems.length > 0; else emptyWishlist">
+    
+
+    <div class="row">
+        <div class="col-md-4" *ngFor="let product of wishlistItems">
+
+            <app-product-card [product]="product"></app-product-card>
+
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+<ng-template #emptyWishlist>
+    <p>
+    Your wishlist is Empty.        
+    </p>
+</ng-template>

@@ -1,0 +1,8 @@
+<div class="product-details" *ngIf="product">
+    <img [src]="'http://localhost:8080/' + product.imageUrl.substring(8)" alt="{{ product.name }}" />
+    <h2>{{ product.name }}</h2>
+    <!-- <p>{{ product.description }}</p> -->
+    <h3>Price: ₹{{ product.price }}</h3>
+    <button (click)="addToCart()">Add to Cart</button>
+  </div>
+  

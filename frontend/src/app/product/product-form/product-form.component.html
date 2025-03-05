@@ -1,0 +1,40 @@
+<div class="container">
+<h2>Add Product</h2>
+
+<!--Image Upload-->
+<div class="mb-3">
+<label class="form-label">Upload Image</label>
+<input type="file" class="form-control" (change)="onFileSelected($event)" />
+<div *ngIf="isUploading" class="text-warning">Uploading...</div>
+<div *ngIf="uploadError" class="text-danger">{{uploadError}}</div>
+</div>
+<!--Preview Uploaded image-->
+<div *ngIf="imageUrl" class="mb-3">
+    <p>Uploaded Image Preview: </p>
+    <img [src]="imageUrl" alt="image" class="img-thumbnail" style="max-width: 200px;" />
+</div>
+
+<!--Product Form-->
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+        <label class="mb-3">Product name</label>
+        <input type="text" class="form-control" formControlName="name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="mb-3">Category</label>
+        <input type="text" class="form-control" formControlName="category" />
+    </div>
+
+    <div class="mb-3">
+        <label class="mb-3">Price</label>
+        <input type="text" class="form-control" formControlName="price" />
+    </div>
+
+    <input type="hidden" formControlName="imageUrl" />
+
+    <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || isUploading">Add Product</button>
+
+</form>
+
+</div>
