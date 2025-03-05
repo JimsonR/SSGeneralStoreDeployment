@@ -12,12 +12,12 @@ services:
     networks:
       - app-network
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ssgenerals
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATASOURCE_URL="jdbc:mysql://mysql:3306/ssgenerals"
+      - SPRING_DATASOURCE_USERNAME="root"
+      - SPRING_DATASOURCE_PASSWORD="1234"
+      - SPRING_JPA_HIBERNATE_DDL_AUTO="update"
     depends_on:
-      - mysqlss
+      - mysql
 # Development
   # frontend:
   #  build:
@@ -36,7 +36,6 @@ services:
 
     ports:
       - "80:80"
-      # - "443:443"
     networks:
       - app-network
     environment:
