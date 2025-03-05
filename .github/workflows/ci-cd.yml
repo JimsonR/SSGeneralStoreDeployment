@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Frontend Docker Image
         run: |
-          docker build -t jimsonrats/ssgenerals-frontend:latest -f Dockerfile.frontend ..
+          docker build -t jimsonrats/ssgenerals-frontend:latest -f Dockerfile.frontend .
 
       #Push Docker Images to Docker Hub
       - name: Login to Docker Hub 
