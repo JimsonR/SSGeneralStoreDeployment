@@ -28,8 +28,8 @@ jobs:
 
       - name: Build Backend Docker Image
         run: |
-          cd backend/SuryaSankaraBackend
-          docker build -t jimsonrats/ssgenerals-backend:latest -f ../Dockerfile.backend .
+          
+          docker build -t jimsonrats/ssgenerals-backend:latest -f Dockerfile.backend .
 
       #FRONTEND: Build Angular & Push Docker Image
       - name: Install Node.js
@@ -45,8 +45,7 @@ jobs:
 
       - name: Build Frontend Docker Image
         run: |
-          cd frontend 
-          docker build -t jimsonrats/ssgenerals-frontend:latest -f ../Dockerfile.frontend ..
+          docker build -t jimsonrats/ssgenerals-frontend:latest -f Dockerfile.frontend ..
 
       #Push Docker Images to Docker Hub
       - name: Login to Docker Hub 
