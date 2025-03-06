@@ -13,7 +13,8 @@ public class GlobalCorsConfig {
     public CorsFilter corsFilter(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("http://localhost");
+        corsConfiguration.addAllowedOrigin("http://ec2-13-126-234-177.ap-south-1.compute.amazonaws.com");
+
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);
