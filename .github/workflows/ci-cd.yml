@@ -98,7 +98,7 @@ jobs:
             # Download the docker compose from repo
 
             mkdir ss
-            curl -o ss/docker-compose.yml https://github.com/JimsonR/SSGeneralStoreDeployment/blob/0d2dc70eecfa6779d1f80b753c8eaac98405b197/docker-compose.yml
+            curl -o ss/docker-compose.yml https://raw.githubusercontent.com/JimsonR/SSGeneralStoreDeployment/refs/heads/main/docker-compose.yml?token=GHSAT0AAAAAAC5AA4A7O5ZTGCHE5BF3YLL2Z6IEUZA 
 
             docker pull jimsonrats/ssgenerals-backend:latest 
             docker pull jimsonrats/ssgenerals-frontend:latest
