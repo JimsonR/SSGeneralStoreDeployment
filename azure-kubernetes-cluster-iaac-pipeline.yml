@@ -87,6 +87,9 @@ stages:
           inputs:
             command: 'import'
             workingDirectory: '$(TF_WORKING_DIR)'
+            environmentServiceName: 'azure-resource-manager-service-connection'
+            backendAzureRmTenantId: '4d143b55-605d-4af2-a581-12ee448bba20'
+            allowTelemetryCollection: true
             resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
             resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
           env:
