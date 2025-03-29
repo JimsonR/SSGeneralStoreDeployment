@@ -117,7 +117,7 @@ stages:
               -var="client_secret=$(client_secret)" \
               -var="ssh_public_key=$(SSH_PUBLIC_KEY)" \
               -var="subscription_id=fbccdf0c-3db4-454b-a6f3-0713e306b7f5" \
-              -var="tenant_id=$(tenant_id)" \
+              -var="tenant_id=4d143b55-605d-4af2-a581-12ee448bba20" \
               azurerm_kubernetes_cluster.terraform-k8s \
               
               /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
