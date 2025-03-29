@@ -116,7 +116,10 @@ stages:
               -var="client_id=$(client_id)" \
               -var="client_secret=$(client_secret)" \
               -var="ssh_public_key=$(SSH_PUBLIC_KEY)" \
+              -var="subscription_id=fbccdf0c-3db4-454b-a6f3-0713e306b7f5" \
+              -var="tenant_id=$(tenant_id)" \
               azurerm_kubernetes_cluster.terraform-k8s \
+              
               /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
           displayName: 'Import AKS Cluster'
           workingDirectory: '$(TF_WORKING_DIR)'
