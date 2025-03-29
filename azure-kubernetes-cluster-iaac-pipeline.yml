@@ -24,16 +24,16 @@ stages:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # # Single-line command that works with Azure CLI 2.70.0
-              # az storage blob delete \
-              #   --container-name storageaccpractisecontainer \
-              #   --name kubernetes-dev.tfstate \
-              #   --account-name storageaccjimsonxyz \
-              #   --auth-mode key \
-              #   --account-key $(az storage account keys list \
-              #     --resource-group terraform-backend-rg \
-              #     --account-name storageaccjimsonxyz \
-              #     --query '[0].value' -o tsv)
+              # Single-line command that works with Azure CLI 2.70.0
+              az storage blob delete \
+                --container-name storageaccpractisecontainer \
+                --name kubernetes-dev.tfstate \
+                --account-name storageaccjimsonxyz \
+                --auth-mode key \
+                --account-key $(az storage account keys list \
+                  --resource-group terraform-backend-rg \
+                  --account-name storageaccjimsonxyz \
+                  --query '[0].value' -o tsv)
               
               # # Verification
               # echo "Remaining blobs:"
@@ -76,90 +76,55 @@ stages:
     jobs:
     - job: TerraformJob
       steps:
-          - task: DownloadSecureFile@1
-            name: publickey
-            inputs:
-              secureFile: 'azure_rsa.pub'
-              retryCount: '5'
-          - bash: |
-              mkdir -p $(Pipeline.Workspace)/sshkeys
+        - task: DownloadSecureFile@1
+          name: publickey
+          inputs:
+            secureFile: 'azure_rsa.pub'
+            retryCount: '5'
+        
+        - bash: |
+            mkdir -p $(Pipeline.Workspace)/sshkeys
+            PUBLIC_KEY_CONTENT=$(cat $(publickey.secureFilePath) | tr -d '\r\n' | awk '{$1=$1};1')
+            
+            if [[ ! "$PUBLIC_KEY_CONTENT" =~ ^ssh-rsa\ [A-Za-z0-9+/]+ ]]; then
+              echo "##vso[task.logissue type=error]Invalid SSH key format" 
+              exit 1
+            fi
 
-              PUBLIC_KEY_CONTENT=$(cat $(publickey.secureFIlePath) | tr -d '\r\n' | awk '{$1=$1};1')
-              
-              if [[ ! "$PUBLIC_KEY_CONTENT" =~ ^ssh-rsa\ [A-Za-z0-9+/]+ ]]; then
-                echo "##vso[task.logissue type=error]Invalid SSH key format" 
-                exit 1
-              fi
+            echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
+            echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$(cat $(CLEAN_KEY_PATH))"
+          displayName: 'Prepare SSH Key'
 
-              echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
+        - task: TerraformCLI@2
+          displayName: 'Terraform Init'
+          inputs:
+            command: 'init'
+            workingDirectory: '$(TF_WORKING_DIR)'
+            backendType: 'azurerm'
+            backendServiceArm: 'azure-resource-manager-service-connection'
+            backendAzureRmResourceGroupName: 'terraform-backend-rg'
+            backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
+            backendAzureRmContainerName: 'storageaccpractisecontainer'
+            backendAzureRmKey: 'kubernetes-dev.tfstate'
 
-              # Set variable for Terraform
-              echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$PUBLIC_KEY_CONTENT"
-              echo "Key file created at: $(CLEAN_KEY_PATH)"
-              ls -la $(CLEAN_KEY_PATH)
-              ls 
-            displayName: 'Prepare SSH Key'
-          
+        - script: |
+            # Remove existing AKS cluster from state if present
+            terraform state rm azurerm_kubernetes_cluster.terraform-k8s 2> /dev/null || true
+            
+            # Import AKS cluster with proper ID format
+            terraform import \
+              -var="client_id=$(client_id)" \
+              -var="client_secret=$(client_secret)" \
+              -var="ssh_public_key=$(SSH_PUBLIC_KEY)" \
+              azurerm_kubernetes_cluster.terraform-k8s \
+              /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
+          displayName: 'Import AKS Cluster'
+          workingDirectory: '$(TF_WORKING_DIR)'
 
-
-          - task: TerraformCLI@2
-            inputs:
-              command: 'init'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              backendType: 'azurerm'
-              backendServiceArm: 'azure-resource-manager-service-connection'
-              # commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
-              backendAzureRmResourceGroupName: 'terraform-backend-rg'
-              backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
-              backendAzureRmContainerName: 'storageaccpractisecontainer'
-              backendAzureRmKey: 'kubernetes-dev.tfstate'
-
-              allowTelemetryCollection: true
-          
-          - bash: |
-              echo "Attempting to force-unlock Terraform state..."
-              echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock a4a9f3e3-1078-a97d-0151-c8f8d98b1f33
-              terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
-            continueOnError: true
-            displayName: 'Cleanup Previous Lock'
-            env:
-              TF_INPUT: 0
-          - script: |
-              # Remove existing AKS cluster from state
-              terraform state rm azurerm_kubernetes_cluster.terraform-k8s
-          - task: TerraformCLI@2
-            displayName: 'Import AKS Cluster (Correct Format)'
-            inputs:
-              command: 'import'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              environmentServiceName: 'azure-resource-manager-service-connection'
-              resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
-             
-              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
-              commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)"'
-
-          # Add this step AFTER 'init' but BEFORE 'apply'
-          - task: TerraformCLI@2
-            displayName: 'Import Existing AKS Cluster'
-            inputs:
-              command: 'import'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              environmentServiceName: 'azure-resource-manager-service-connection'
-              resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
-              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev'
-              commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)"'
-
-          - task: TerraformCLI@2
-            inputs:
-              command: 'apply'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              environmentServiceName: 'azure-resource-manager-service-connection'
-              commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
-
-          
-          - task: TerraformCLI@2
-            inputs:
-              command: 'destroy'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              environmentServiceName: 'azure-resource-manager-service-connection'
-              commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=2"'
+        - task: TerraformCLI@2
+          displayName: 'Terraform Apply'
+          inputs:
+            command: 'apply'
+            workingDirectory: '$(TF_WORKING_DIR)'
+            environmentServiceName: 'azure-resource-manager-service-connection'
+            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)" -var="node_count=2"'
