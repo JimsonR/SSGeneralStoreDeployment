@@ -111,8 +111,9 @@ stages:
               # commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
               backendAzureRmResourceGroupName: 'terraform-backend-rg'
               backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
-              backendAzureRmKey: 'kubernetes-dev.tfstate'
               backendAzureRmContainerName: 'storageaccpractisecontainer'
+              backendAzureRmKey: 'kubernetes-dev.tfstate'
+
               allowTelemetryCollection: true
 
           # - task: TerraformCLI@2
