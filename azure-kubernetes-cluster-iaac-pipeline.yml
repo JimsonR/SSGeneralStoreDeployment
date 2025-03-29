@@ -79,7 +79,7 @@ stages:
               echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$PUBLIC_KEY_CONTENT"
               echo "Key file created at: $(CLEAN_KEY_PATH)"
               ls -la $(CLEAN_KEY_PATH)
-              ls $(TF_WORKING_DIR)
+              ls 
             displayName: 'Prepare SSH Key'
           
 
