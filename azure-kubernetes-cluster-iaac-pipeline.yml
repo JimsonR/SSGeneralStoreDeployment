@@ -115,12 +115,15 @@ stages:
               backendAzureRmKey: 'kubernetes-dev.tfstate'
 
               allowTelemetryCollection: true
-          - task: TerraformCLI@2
-            displayName: 'Force-Unlock State'
-            inputs:
-              command: 'forceunlock'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              commandOptions: '-force 073ef029-24c2-dd0b-ed84-213f79d1eb4c'  # Use the Lock ID from the error
+          
+          - bash: |
+              echo "Attempting to force-unlock Terraform state..."
+              echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock cb99e0f8-2609-8191-cbba-7bcc9b912a62
+              terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
+            continueOnError: true
+            displayName: 'Cleanup Previous Lock'
+            env:
+              TF_INPUT: 0
 
 
           # Add this step AFTER 'init' but BEFORE 'apply'
