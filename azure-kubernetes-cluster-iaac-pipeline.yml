@@ -90,6 +90,7 @@ stages:
               workingDirectory: '$(TF_WORKING_DIR)'
               backendType: 'azurerm'
               backendServiceArm: 'azure-resource-manager-service-connection'
+              commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
               backendAzureRmResourceGroupName: 'terraform-backend-rg'
               backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
               backendAzureRmKey: 'kubernetes-dev.tfstate'
