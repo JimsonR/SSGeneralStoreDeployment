@@ -122,6 +122,7 @@ stages:
               workingDirectory: '$(TF_WORKING_DIR)'
               commandOptions: '-force 073ef029-24c2-dd0b-ed84-213f79d1eb4c'  # Use the Lock ID from the error
 
+
           # Add this step AFTER 'init' but BEFORE 'apply'
           - task: TerraformCLI@2
             displayName: 'Import Existing AKS Cluster'
