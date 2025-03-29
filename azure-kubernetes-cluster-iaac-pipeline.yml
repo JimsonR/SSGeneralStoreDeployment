@@ -116,16 +116,24 @@ stages:
 
               allowTelemetryCollection: true
           
-          - bash: |
-              echo "Attempting to force-unlock Terraform state..."
-              echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock 073ef029-24c2-dd0b-ed84-213f79d1eb4c
+          # - bash: |
+          #     echo "Attempting to force-unlock Terraform state..."
+          #     echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock 073ef029-24c2-dd0b-ed84-213f79d1eb4c
 
-              terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
-            continueOnError: true
-            displayName: 'Cleanup Previous Lock'
-            env:
-              TF_INPUT: 0
+          #     terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
+          #   continueOnError: true
+          #   displayName: 'Cleanup Previous Lock'
+          #   env:
+          #     TF_INPUT: 0
 
+          - task: TerraformCLI@2
+            displayName: 'Import Resource Group'
+            inputs:
+              command: 'import'
+              workingDirectory: '$(TF_WORKING_DIR)'
+              environmentServiceName: 'azure-resource-manager-service-connection'
+              resourceAddress: 'azurerm_resource_group.resource_group'
+              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev'
 
           # Add this step AFTER 'init' but BEFORE 'apply'
           - task: TerraformCLI@2
