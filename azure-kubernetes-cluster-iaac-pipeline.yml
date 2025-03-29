@@ -124,7 +124,9 @@ stages:
             displayName: 'Cleanup Previous Lock'
             env:
               TF_INPUT: 0
-
+          - script: |
+              # Remove existing AKS cluster from state
+              terraform state rm azurerm_kubernetes_cluster.terraform-k8s
           - task: TerraformCLI@2
             displayName: 'Import AKS Cluster (Correct Format)'
             inputs:
