@@ -1,3 +1,122 @@
+# trigger:
+# - main
+
+# pool:
+#   vmImage: ubuntu-latest
+
+# variables:
+#   TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)/configuration/iaac/kubernetes'
+#   CLEAN_KEY_PATH: '$(Pipeline.Workspace)/sshkeys/cleaned_key.pub'
+
+# stages:
+#   - stage: Setup
+#     jobs:
+#     - job: AzureSetup
+#       steps:
+#         - task: AzureCLI@2
+#           displayName: 'Prepare Storage Access'
+#           inputs:
+#             azureSubscription: 'azure-resource-manager-service-connection'
+#             scriptType: 'bash'
+#             scriptLocation: 'inlineScript'
+#             inlineScript: |
+#               # Get and validate storage key
+#               STORAGE_KEY=$(az storage account keys list \
+#                 --resource-group terraform-backend-rg \
+#                 --account-name storageaccjimsonxyz \
+#                 --query '[0].value' -o tsv)
+              
+#               # Break any existing lease (silently fail if none exists)
+#               set +e
+#               az storage blob lease break \
+#                 --container-name storageaccpractisecontainer \
+#                 --blob-name kubernetes-dev.tfstate \
+#                 --account-name storageaccjimsonxyz \
+#                 --auth-mode key \
+#                 --account-key $STORAGE_KEY 2>/dev/null
+#               set -e
+              
+#               # Set as pipeline variable for later use
+#               echo "##vso[task.setvariable variable=STORAGE_KEY;issecret=true]$STORAGE_KEY"
+
+#   - stage: Terraform
+#     jobs:
+#     - job: TerraformJob
+#       steps:
+#         - task: DownloadSecureFile@1
+#           name: publickey
+#           inputs:
+#             secureFile: 'azure_rsa.pub'
+#             retryCount: '5'
+        
+#         - bash: |
+#             mkdir -p $(Pipeline.Workspace)/sshkeys
+#             PUBLIC_KEY_CONTENT=$(cat $(publickey.secureFilePath) | tr -d '\r\n' | awk '{$1=$1};1')
+            
+#             if [[ ! "$PUBLIC_KEY_CONTENT" =~ ^ssh-rsa\ [A-Za-z0-9+/]+ ]]; then
+#               echo "##vso[task.logissue type=error]Invalid SSH key format" 
+#               exit 1
+#             fi
+
+#             echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
+#             echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$(cat $(CLEAN_KEY_PATH))"
+#           displayName: 'Prepare SSH Key'
+
+#         - task: TerraformCLI@2
+#           displayName: 'Terraform Init'
+#           inputs:
+#             command: 'init'
+#             workingDirectory: '$(TF_WORKING_DIR)'
+#             backendType: 'azurerm'
+#             backendAzureRmResourceGroupName: 'terraform-backend-rg'
+#             backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
+#             backendAzureRmContainerName: 'storageaccpractisecontainer'
+#             backendAzureRmKey: 'kubernetes-dev.tfstate'
+#             commandOptions: '-reconfigure'
+#           env:
+#             ARM_ACCESS_KEY: $(STORAGE_KEY)
+#             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+
+#         - script: |
+#             # Verify state contents before import
+#             echo "Current state resources:"
+#             terraform state list
+#           displayName: 'Check State Before Import'
+#           workingDirectory: '$(TF_WORKING_DIR)'
+
+#         - task: TerraformCLI@2
+#           displayName: 'Import AKS Cluster'
+#           inputs:
+#             command: 'import'
+#             workingDirectory: '$(TF_WORKING_DIR)'
+#             resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
+#             resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
+#           env:
+#             ARM_CLIENT_ID: $(client_id)
+#             ARM_CLIENT_SECRET: $(client_secret)
+#             ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
+#             ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
+
+#         - script: |
+#             # Verify import succeeded
+#             echo "State after import:"
+#             terraform state list
+#             terraform show
+#           displayName: 'Verify Import'
+#           workingDirectory: '$(TF_WORKING_DIR)'
+
+#         - task: TerraformCLI@2
+#           displayName: 'Terraform Apply'
+#           inputs:
+#             command: 'apply'
+#             workingDirectory: '$(TF_WORKING_DIR)'
+#             commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)" -var="node_count=2"'
+#           env:
+#             ARM_CLIENT_ID: $(client_id)
+#             ARM_CLIENT_SECRET: $(client_secret)
+#             ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
+#             ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
+
 trigger:
 - main
 
@@ -9,45 +128,15 @@ variables:
   CLEAN_KEY_PATH: '$(Pipeline.Workspace)/sshkeys/cleaned_key.pub'
 
 stages:
-  - stage: Setup
+  - stage: Deploy
     jobs:
-    - job: AzureSetup
+    - job: TerraformDeploy
       steps:
-        - task: AzureCLI@2
-          displayName: 'Prepare Storage Access'
-          inputs:
-            azureSubscription: 'azure-resource-manager-service-connection'
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              # Get and validate storage key
-              STORAGE_KEY=$(az storage account keys list \
-                --resource-group terraform-backend-rg \
-                --account-name storageaccjimsonxyz \
-                --query '[0].value' -o tsv)
-              
-              # Break any existing lease (silently fail if none exists)
-              set +e
-              az storage blob lease break \
-                --container-name storageaccpractisecontainer \
-                --blob-name kubernetes-dev.tfstate \
-                --account-name storageaccjimsonxyz \
-                --auth-mode key \
-                --account-key $STORAGE_KEY 2>/dev/null
-              set -e
-              
-              # Set as pipeline variable for later use
-              echo "##vso[task.setvariable variable=STORAGE_KEY;issecret=true]$STORAGE_KEY"
-
-  - stage: Terraform
-    jobs:
-    - job: TerraformJob
-      steps:
+        # 1. Download and prepare SSH key (same as working pipeline)
         - task: DownloadSecureFile@1
           name: publickey
           inputs:
             secureFile: 'azure_rsa.pub'
-            retryCount: '5'
         
         - bash: |
             mkdir -p $(Pipeline.Workspace)/sshkeys
@@ -62,57 +151,34 @@ stages:
             echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$(cat $(CLEAN_KEY_PATH))"
           displayName: 'Prepare SSH Key'
 
+        # 2. State management (from working pipeline)
+        - bash: |
+            echo "Attempting to force-unlock Terraform state..."
+            echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock cb99e0f8-2609-8191-cbba-7bcc9b912a62
+            terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
+          continueOnError: true
+          displayName: 'Cleanup Previous Lock'
+          env:
+            TF_INPUT: 0
+
+        # 3. Terraform Init (consistent auth approach)
         - task: TerraformCLI@2
           displayName: 'Terraform Init'
           inputs:
             command: 'init'
             workingDirectory: '$(TF_WORKING_DIR)'
             backendType: 'azurerm'
+            backendServiceArm: 'azure-resource-manager-service-connection'
             backendAzureRmResourceGroupName: 'terraform-backend-rg'
             backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
             backendAzureRmContainerName: 'storageaccpractisecontainer'
             backendAzureRmKey: 'kubernetes-dev.tfstate'
-            commandOptions: '-reconfigure'
-          env:
-            ARM_ACCESS_KEY: $(STORAGE_KEY)
-            ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
 
-        - script: |
-            # Verify state contents before import
-            echo "Current state resources:"
-            terraform state list
-          displayName: 'Check State Before Import'
-          workingDirectory: '$(TF_WORKING_DIR)'
-
-        - task: TerraformCLI@2
-          displayName: 'Import AKS Cluster'
-          inputs:
-            command: 'import'
-            workingDirectory: '$(TF_WORKING_DIR)'
-            resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
-            resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
-          env:
-            ARM_CLIENT_ID: $(client_id)
-            ARM_CLIENT_SECRET: $(client_secret)
-            ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
-            ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
-
-        - script: |
-            # Verify import succeeded
-            echo "State after import:"
-            terraform state list
-            terraform show
-          displayName: 'Verify Import'
-          workingDirectory: '$(TF_WORKING_DIR)'
-
+        # 4. Terraform Apply (using same auth as working pipeline)
         - task: TerraformCLI@2
           displayName: 'Terraform Apply'
           inputs:
             command: 'apply'
             workingDirectory: '$(TF_WORKING_DIR)'
-            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)" -var="node_count=2"'
-          env:
-            ARM_CLIENT_ID: $(client_id)
-            ARM_CLIENT_SECRET: $(client_secret)
-            ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
-            ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
+            environmentServiceName: 'azure-resource-manager-service-connection'
+            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=2"'
