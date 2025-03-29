@@ -128,40 +128,26 @@ variables:
   CLEAN_KEY_PATH: '$(Pipeline.Workspace)/sshkeys/cleaned_key.pub'
 
 stages:
-  - stage: Deploy
+  - stage: Prepare
     jobs:
-    - job: TerraformDeploy
+    - job: Setup
       steps:
-        # 1. Download and prepare SSH key (same as working pipeline)
         - task: DownloadSecureFile@1
           name: publickey
           inputs:
             secureFile: 'azure_rsa.pub'
-        
+
         - bash: |
             mkdir -p $(Pipeline.Workspace)/sshkeys
             PUBLIC_KEY_CONTENT=$(cat $(publickey.secureFilePath) | tr -d '\r\n' | awk '{$1=$1};1')
-            
-            if [[ ! "$PUBLIC_KEY_CONTENT" =~ ^ssh-rsa\ [A-Za-z0-9+/]+ ]]; then
-              echo "##vso[task.logissue type=error]Invalid SSH key format" 
-              exit 1
-            fi
-
             echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
             echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$(cat $(CLEAN_KEY_PATH))"
           displayName: 'Prepare SSH Key'
 
-        # 2. State management (from working pipeline)
-        - bash: |
-            echo "Attempting to force-unlock Terraform state..."
-            echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock cb99e0f8-2609-8191-cbba-7bcc9b912a62
-            terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
-          continueOnError: true
-          displayName: 'Cleanup Previous Lock'
-          env:
-            TF_INPUT: 0
-
-        # 3. Terraform Init (consistent auth approach)
+  # - stage: Import
+  #   jobs:
+  #   - job: ImportResources
+      # steps:
         - task: TerraformCLI@2
           displayName: 'Terraform Init'
           inputs:
@@ -174,11 +160,35 @@ stages:
             backendAzureRmContainerName: 'storageaccpractisecontainer'
             backendAzureRmKey: 'kubernetes-dev.tfstate'
 
-        # 4. Terraform Apply (using same auth as working pipeline)
+        - script: |
+            # Import existing resource group
+            terraform import azurerm_resource_group.resource_group /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev || echo "Resource group may already be imported"
+            
+            # Import AKS cluster
+            terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
+          displayName: 'Import Existing Resources'
+          env:
+            ARM_CLIENT_ID: $(client_id)
+            ARM_CLIENT_SECRET: $(client_secret)
+            ARM_TENANT_ID: $(tenant_id)
+            ARM_SUBSCRIPTION_ID: $(subscription_id)
+
+  - stage: Deploy
+    jobs:
+    - job: Apply
+      steps:
+        - task: TerraformCLI@2
+          displayName: 'Terraform Plan'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(TF_WORKING_DIR)'
+            environmentServiceName: 'azure-resource-manager-service-connection'
+            commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=$(node_count)"'
+
         - task: TerraformCLI@2
           displayName: 'Terraform Apply'
           inputs:
             command: 'apply'
             workingDirectory: '$(TF_WORKING_DIR)'
             environmentServiceName: 'azure-resource-manager-service-connection'
-            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=2"'
+            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=$(node_count)"'
