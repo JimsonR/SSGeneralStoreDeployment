@@ -161,17 +161,22 @@ stages:
             backendAzureRmKey: 'kubernetes-dev.tfstate'
 
         - script: |
-            # Import existing resource group
-            terraform import azurerm_resource_group.resource_group /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev || echo "Resource group may already be imported"
+            echo "Current working directory: $(pwd)"
+            echo "Terraform files in directory:"
+            ls -la $(TF_WORKING_DIR)/*.tf
             
-            # Import AKS cluster
-            terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
+            # Import resources with explicit working directory
+            terraform -chdir=$(TF_WORKING_DIR) import azurerm_resource_group.resource_group /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev || echo "Resource group may already be imported"
+            
+            terraform -chdir=$(TF_WORKING_DIR) import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
           displayName: 'Import Existing Resources'
           env:
             ARM_CLIENT_ID: $(client_id)
             ARM_CLIENT_SECRET: $(client_secret)
             ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
             ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
+        - script: terraform -chdir=$(TF_WORKING_DIR) state list
+          displayName: 'Verify Imported Resources'
   - stage: Deploy
     jobs:
     - job: Apply
