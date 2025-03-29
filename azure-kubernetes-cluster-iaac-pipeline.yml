@@ -68,11 +68,11 @@ stages:
             backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
             backendAzureRmContainerName: 'storageaccpractisecontainer'
             backendAzureRmKey: 'kubernetes-dev.tfstate'
-          env:
-            ARM_ACCESS_KEY: $(az storage account keys list \
-              --resource-group terraform-backend-rg \
-              --account-name storageaccjimsonxyz \
-              --query '[0].value' -o tsv)
+          # env:
+          #   ARM_ACCESS_KEY: $(az storage account keys list \
+          #     --resource-group terraform-backend-rg \
+          #     --account-name storageaccjimsonxyz \
+          #     --query '[0].value' -o tsv)
 
         - script: |
             # Remove existing AKS cluster from state if present
