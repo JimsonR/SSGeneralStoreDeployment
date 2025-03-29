@@ -116,15 +116,14 @@ stages:
 
               allowTelemetryCollection: true
           
-          # - bash: |
-          #     echo "Attempting to force-unlock Terraform state..."
-          #     echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock 073ef029-24c2-dd0b-ed84-213f79d1eb4c
-
-          #     terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
-          #   continueOnError: true
-          #   displayName: 'Cleanup Previous Lock'
-          #   env:
-          #     TF_INPUT: 0
+          - bash: |
+              echo "Attempting to force-unlock Terraform state..."
+              echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock a4a9f3e3-1078-a97d-0151-c8f8d98b1f33
+              terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
+            continueOnError: true
+            displayName: 'Cleanup Previous Lock'
+            env:
+              TF_INPUT: 0
 
           - task: TerraformCLI@2
             displayName: 'Import AKS Cluster (Correct Format)'
