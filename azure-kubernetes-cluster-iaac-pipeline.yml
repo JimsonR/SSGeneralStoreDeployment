@@ -25,14 +25,14 @@ stages:
             scriptLocation: 'inlineScript'
             inlineScript: |
               echo "Checking if resource grpup exists..."
-              if !az group show --name terraform-backend-rg --output none; then
+              if ! az group show --name terraform-backend-rg --output none; then
                 echo "Resource group not found. Creating..."
                 az group create --name terraform-backend-rg --location westeurope
               else
                 echo "Resource group exists"
               fi
               echo "Checking if storage account exists"
-              if !az storage account show --name storageaccjimsonxyz --resource-group terraform-backend-rg --output none; then
+              if ! az storage account show --name storageaccjimsonxyz --resource-group terraform-backend-rg --output none; then
                 echo "Storage account not forun. Creating..."
                 az storage account create \
                   --name storageaccjimsonxyz \
