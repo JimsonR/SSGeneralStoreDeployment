@@ -24,96 +24,97 @@ stages:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # # Delete the state file
-              # az storage blob delete \
-              #   --container-name storageaccpractisecontainer \
-              #   --name kubernetes-dev.tfstate \
-              #   --account-name storageaccjimsonxyz \
-              #   --auth-mode login
-              
-              # # Verify deletion
-              # echo "State file deleted. Current blobs:"
-              # az storage blob list \
-              #   --container-name storageaccpractisecontainer \
-              #   --account-name storageaccjimsonxyz \
-              #   --output table
-
-              echo "Checking if resource grpup exists..."
-              if ! az group show --name terraform-backend-rg --output none; then
-                echo "Resource group not found. Creating..."
-                az group create --name terraform-backend-rg --location westeurope
-              else
-                echo "Resource group exists"
-              fi
-              echo "Checking if storage account exists"
-              if ! az storage account show --name storageaccjimsonxyz --resource-group terraform-backend-rg --output none; then
-                echo "Storage account not forun. Creating..."
-                az storage account create \
-                  --name storageaccjimsonxyz \
-                  --resource-group terraform-backend-rg \
-                  --sku Standard_RAGRS \
-                  --kind StorageV2 \
-                  --encryption-service blob \
-                  --https-only true \
-                  --allow-blob-public-access false \
-                  --min-tls-version TLS1_2
-              else
-                echo "Storage account exists."
-              fi
-              echo "Create storage container if it doesnot exist..."
-              az storage container create \
-                --name storageaccpractisecontainer\
+  
+              # Delete the state file
+              az storage blob delete \
+                --container-name storageaccpractisecontainer \
+                --name kubernetes-dev.tfstate \
                 --account-name storageaccjimsonxyz \
                 --auth-mode login
-          displayName: 'Create Azure Resources'
-
-
-  - stage: Terraform
-    jobs:
-    - job: TerraformJob
-      steps:
-          - task: DownloadSecureFile@1
-            name: publickey
-            inputs:
-              secureFile: 'azure_rsa.pub'
-              retryCount: '5'
-          - bash: |
-              mkdir -p $(Pipeline.Workspace)/sshkeys
-
-              PUBLIC_KEY_CONTENT=$(cat $(publickey.secureFIlePath) | tr -d '\r\n' | awk '{$1=$1};1')
               
-              if [[ ! "$PUBLIC_KEY_CONTENT" =~ ^ssh-rsa\ [A-Za-z0-9+/]+ ]]; then
-                echo "##vso[task.logissue type=error]Invalid SSH key format" 
-                exit 1
-              fi
+              # Verify deletion
+              echo "State file deleted. Current blobs:"
+              az storage blob list \
+                --container-name storageaccpractisecontainer \
+                --account-name storageaccjimsonxyz \
+                --output table
 
-              echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
+  #             echo "Checking if resource grpup exists..."
+  #             if ! az group show --name terraform-backend-rg --output none; then
+  #               echo "Resource group not found. Creating..."
+  #               az group create --name terraform-backend-rg --location westeurope
+  #             else
+  #               echo "Resource group exists"
+  #             fi
+  #             echo "Checking if storage account exists"
+  #             if ! az storage account show --name storageaccjimsonxyz --resource-group terraform-backend-rg --output none; then
+  #               echo "Storage account not forun. Creating..."
+  #               az storage account create \
+  #                 --name storageaccjimsonxyz \
+  #                 --resource-group terraform-backend-rg \
+  #                 --sku Standard_RAGRS \
+  #                 --kind StorageV2 \
+  #                 --encryption-service blob \
+  #                 --https-only true \
+  #                 --allow-blob-public-access false \
+  #                 --min-tls-version TLS1_2
+  #             else
+  #               echo "Storage account exists."
+  #             fi
+  #             echo "Create storage container if it doesnot exist..."
+  #             az storage container create \
+  #               --name storageaccpractisecontainer\
+  #               --account-name storageaccjimsonxyz \
+  #               --auth-mode login
+  #         displayName: 'Create Azure Resources'
 
-              # Set variable for Terraform
-              echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$PUBLIC_KEY_CONTENT"
-              echo "Key file created at: $(CLEAN_KEY_PATH)"
-              ls -la $(CLEAN_KEY_PATH)
-              ls 
-            displayName: 'Prepare SSH Key'
+
+  # - stage: Terraform
+  #   jobs:
+  #   - job: TerraformJob
+  #     steps:
+  #         - task: DownloadSecureFile@1
+  #           name: publickey
+  #           inputs:
+  #             secureFile: 'azure_rsa.pub'
+  #             retryCount: '5'
+  #         - bash: |
+  #             mkdir -p $(Pipeline.Workspace)/sshkeys
+
+  #             PUBLIC_KEY_CONTENT=$(cat $(publickey.secureFIlePath) | tr -d '\r\n' | awk '{$1=$1};1')
+              
+  #             if [[ ! "$PUBLIC_KEY_CONTENT" =~ ^ssh-rsa\ [A-Za-z0-9+/]+ ]]; then
+  #               echo "##vso[task.logissue type=error]Invalid SSH key format" 
+  #               exit 1
+  #             fi
+
+  #             echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
+
+  #             # Set variable for Terraform
+  #             echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$PUBLIC_KEY_CONTENT"
+  #             echo "Key file created at: $(CLEAN_KEY_PATH)"
+  #             ls -la $(CLEAN_KEY_PATH)
+  #             ls 
+  #           displayName: 'Prepare SSH Key'
           
 
 
-          - task: TerraformCLI@2
-            inputs:
-              command: 'init'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              backendType: 'azurerm'
-              backendServiceArm: 'azure-resource-manager-service-connection'
-              commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
-              backendAzureRmResourceGroupName: 'terraform-backend-rg'
-              backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
-              backendAzureRmKey: 'kubernetes-dev.tfstate'
-              backendAzureRmContainerName: 'storageaccpractisecontainer'
-              allowTelemetryCollection: true
-          - task: TerraformCLI@2
-            inputs:
-              command: 'apply'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              environmentServiceName: 'azure-resource-manager-service-connection'
-              commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
+  #         - task: TerraformCLI@2
+  #           inputs:
+  #             command: 'init'
+  #             workingDirectory: '$(TF_WORKING_DIR)'
+  #             backendType: 'azurerm'
+  #             backendServiceArm: 'azure-resource-manager-service-connection'
+  #             commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
+  #             backendAzureRmResourceGroupName: 'terraform-backend-rg'
+  #             backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
+  #             backendAzureRmKey: 'kubernetes-dev.tfstate'
+  #             backendAzureRmContainerName: 'storageaccpractisecontainer'
+  #             allowTelemetryCollection: true
+  #         - task: TerraformCLI@2
+  #           inputs:
+  #             command: 'apply'
+  #             workingDirectory: '$(TF_WORKING_DIR)'
+  #             environmentServiceName: 'azure-resource-manager-service-connection'
+  #             commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
 
