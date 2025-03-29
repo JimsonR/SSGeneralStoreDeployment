@@ -86,7 +86,7 @@ stages:
           - task: TerraformCLI@2
             inputs:
               command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+              workingDirectory: '$(TF_WORKING_DIR)'
               backendType: 'azurerm'
               backendServiceArm: 'azure-resource-manager-service-connection'
               backendAzureRmTenantId: '4d143b55-605d-4af2-a581-12ee448bba20'
@@ -99,7 +99,7 @@ stages:
           - task: TerraformCLI@2
             inputs:
               command: 'apply'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+              workingDirectory: '$(TF_WORKING_DIR)'
               environmentServiceName: 'azure-resource-manager-service-connection'
               commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)"'
 
