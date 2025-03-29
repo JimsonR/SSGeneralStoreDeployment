@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+  TF_WORKING_DIR: '$(System.DefaultWorkingDirectory)/configuration/iaac/kubernetes'
   CLEAN_KEY_PATH: '$(Pipeline.Workspace)/sshkeys/cleaned_key.pub' 
 
 stages:
