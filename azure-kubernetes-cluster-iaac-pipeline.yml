@@ -118,7 +118,8 @@ stages:
           
           - bash: |
               echo "Attempting to force-unlock Terraform state..."
-              echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock cb99e0f8-2609-8191-cbba-7bcc9b912a62
+              echo "yes" | terraform -chdir=$(TF_WORKING_DIR) force-unlock 073ef029-24c2-dd0b-ed84-213f79d1eb4c
+
               terraform -chdir=$(TF_WORKING_DIR) init -reconfigure
             continueOnError: true
             displayName: 'Cleanup Previous Lock'
@@ -134,7 +135,7 @@ stages:
               workingDirectory: '$(TF_WORKING_DIR)'
               environmentServiceName: 'azure-resource-manager-service-connection'
               resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
-              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
+              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev'
               commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)"'
 
           - task: TerraformCLI@2
