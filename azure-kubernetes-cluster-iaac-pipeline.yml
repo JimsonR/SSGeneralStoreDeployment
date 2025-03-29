@@ -116,12 +116,12 @@ stages:
 
               allowTelemetryCollection: true
 
-          # - task: TerraformCLI@2
-          #   inputs:
-          #     command: 'apply'
-          #     workingDirectory: '$(TF_WORKING_DIR)'
-          #     environmentServiceName: 'azure-resource-manager-service-connection'
-          #     commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
+          - task: TerraformCLI@2
+            inputs:
+              command: 'apply'
+              workingDirectory: '$(TF_WORKING_DIR)'
+              environmentServiceName: 'azure-resource-manager-service-connection'
+              commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="resource_group=kubepractise" -var="node_count=2" '
 
           
           - task: TerraformCLI@2
