@@ -115,14 +115,14 @@ stages:
               backendAzureRmKey: 'kubernetes-dev.tfstate'
 
               allowTelemetryCollection: true
-          # Add this step AFTER 'init' but BEFORE 'apply'
-          - task: TerraformCLI@2
-            displayName: 'Import Existing AKS Cluster'
-            inputs:
-              command: 'import'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              environmentServiceName: 'azure-resource-manager-service-connection'
-              commandOptions: 'azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
+          # # Add this step AFTER 'init' but BEFORE 'apply'
+          # - task: TerraformCLI@2
+          #   displayName: 'Import Existing AKS Cluster'
+          #   inputs:
+          #     command: 'import'
+          #     workingDirectory: '$(TF_WORKING_DIR)'
+          #     environmentServiceName: 'azure-resource-manager-service-connection'
+          #     commandOptions: 'azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
 
           - task: TerraformCLI@2
             inputs:
