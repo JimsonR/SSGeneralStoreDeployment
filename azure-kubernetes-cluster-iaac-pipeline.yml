@@ -113,16 +113,17 @@ stages:
             terraform state rm azurerm_kubernetes_cluster.terraform-k8s 2> /dev/null || true
             
             # Import AKS cluster with proper syntax
-            terraform import \
-              azurerm_kubernetes_cluster.terraform-k8s \
-              "/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev"
-          displayName: 'Import AKS Cluster'
-          workingDirectory: '$(TF_WORKING_DIR)'
-          env:
-            ARM_SUBSCRIPTION_ID: 'fbccdf0c-3db4-454b-a6f3-0713e306b7f5'
-            ARM_CLIENT_ID: '$(client_id)'
-            ARM_CLIENT_SECRET: '$(client_secret)'
-            ARM_TENANT_ID: '4d143b55-605d-4af2-a581-12ee448bba20'
+          #   terraform import \
+          #     azurerm_kubernetes_cluster.terraform-k8s \
+          #     "/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev"
+          # displayName: 'Import AKS Cluster'
+          # workingDirectory: '$(TF_WORKING_DIR)'
+          # env:
+          #   ARM_SUBSCRIPTION_ID: 'fbccdf0c-3db4-454b-a6f3-0713e306b7f5'
+          #   ARM_CLIENT_ID: '$(client_id)'
+          #   ARM_CLIENT_SECRET: '$(client_secret)'
+          #   ARM_TENANT_ID: '4d143b55-605d-4af2-a581-12ee448bba20'
+          
         # - task: TerraformCLI@2
         #   displayName: 'Import AKS Cluster'
         #   inputs:
@@ -135,6 +136,17 @@ stages:
         #     ARM_CLIENT_ID: '$(client_id)'
         #     ARM_CLIENT_SECRET: '$(client_secret)'
         #     ARM_TENANT_ID: '4d143b55-605d-4af2-a581-12ee448bba20'
+                # 3. Import AKS cluster with correct authentication
+        - task: TerraformCLI@2
+          displayName: 'Import AKS Cluster'
+          inputs:
+            command: 'import'
+            workingDirectory: '$(TF_WORKING_DIR)'
+            resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
+            resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
+          env:
+            ARM_USE_AZUREAD: 'true'
+            ARM_USE_MSI: 'false'
 
         - task: TerraformCLI@2
           displayName: 'Terraform Apply'
