@@ -20,10 +20,10 @@ stages:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # Break any existing locks
+              # Break any existing state locks
               az storage blob lease break \
                 --container-name storageaccpractisecontainer \
-                --name kubernetes-dev.tfstate \
+                --blob-name kubernetes-dev.tfstate \
                 --account-name storageaccjimsonxyz \
                 --auth-mode key \
                 --account-key $(az storage account keys list \
