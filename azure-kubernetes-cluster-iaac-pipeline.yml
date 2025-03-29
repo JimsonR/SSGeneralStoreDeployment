@@ -34,10 +34,10 @@ stages:
                 || echo "No lease to break"
               set -e
 
-  - stage: Terraform
-    jobs:
-    - job: TerraformJob
-      steps:
+  # - stage: Terraform
+  #   jobs:
+  #   - job: TerraformJob
+  #     steps:
         - task: DownloadSecureFile@1
           name: publickey
           inputs:
