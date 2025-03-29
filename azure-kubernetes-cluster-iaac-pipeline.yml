@@ -24,16 +24,19 @@ stages:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-  
-              # Delete the state file
+              # Single-line command that works with Azure CLI 2.70.0
               az storage blob delete \
                 --container-name storageaccpractisecontainer \
                 --name kubernetes-dev.tfstate \
                 --account-name storageaccjimsonxyz \
-                --auth-mode login
+                --auth-mode key \
+                --account-key $(az storage account keys list \
+                  --resource-group terraform-backend-rg \
+                  --account-name storageaccjimsonxyz \
+                  --query '[0].value' -o tsv)
               
-              # Verify deletion
-              echo "State file deleted. Current blobs:"
+              # Verification
+              echo "Remaining blobs:"
               az storage blob list \
                 --container-name storageaccpractisecontainer \
                 --account-name storageaccjimsonxyz \
