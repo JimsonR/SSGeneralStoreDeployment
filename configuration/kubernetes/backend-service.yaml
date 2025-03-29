@@ -1,12 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  labels: #PODS
+    app: ssgenerals-backend
+  name: ssgenerals-backend
+  namespace: default
 spec:
-  selector:
-    app: backend
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-  type: ClusterIP
+  - # nodePort: 30702 #CHANGE
+    port: 8080 #CHANGE
+    protocol: TCP
+    targetPort: 8080 #CHANGE
+  selector:
+    app: ssgenerals-backend
+  sessionAffinity: None #CHANGE
+  type: LoadBalancer
