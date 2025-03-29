@@ -20,7 +20,8 @@ stages:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # Break any existing state locks
+              # Attempt to break lease if exists, ignore if doesn't
+              set +e
               az storage blob lease break \
                 --container-name storageaccpractisecontainer \
                 --blob-name kubernetes-dev.tfstate \
@@ -29,7 +30,9 @@ stages:
                 --account-key $(az storage account keys list \
                   --resource-group terraform-backend-rg \
                   --account-name storageaccjimsonxyz \
-                  --query '[0].value' -o tsv)
+                  --query '[0].value' -o tsv) \
+                || echo "No lease to break"
+              set -e
 
   - stage: Terraform
     jobs:
