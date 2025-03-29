@@ -127,13 +127,15 @@ stages:
           #     TF_INPUT: 0
 
           - task: TerraformCLI@2
-            displayName: 'Import Resource Group'
+            displayName: 'Import AKS Cluster (Correct Format)'
             inputs:
               command: 'import'
               workingDirectory: '$(TF_WORKING_DIR)'
               environmentServiceName: 'azure-resource-manager-service-connection'
-              resourceAddress: 'azurerm_resource_group.resource_group'
-              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev'
+              resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
+             
+              resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
+              commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)"'
 
           # Add this step AFTER 'init' but BEFORE 'apply'
           - task: TerraformCLI@2
