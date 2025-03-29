@@ -14,16 +14,30 @@ variables:
   CLEAN_KEY_PATH: '$(Pipeline.Workspace)/sshkeys/cleaned_key.pub' 
 
 stages:
-  # - stage: Setup
-  #   jobs:
-  #   - job: AzureSetup
-  #     steps:
-  #       - task: AzureCLI@2
-  #         inputs:
-  #           azureSubscription: 'azure-resource-manager-service-connection'
-  #           scriptType: 'bash'
-  #           scriptLocation: 'inlineScript'
-  #           inlineScript: |
+  - stage: Setup
+    jobs:
+    - job: AzureSetup
+      steps:
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: 'azure-resource-manager-service-connection'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              # Delete the state file
+              az storage blob delete \
+                --container-name storageaccpractisecontainer \
+                --name kubernetes-dev.tfstate \
+                --account-name storageaccjimsonxyz \
+                --auth-mode login
+              
+              # Verify deletion
+              echo "State file deleted. Current blobs:"
+              az storage blob list \
+                --container-name storageaccpractisecontainer \
+                --account-name storageaccjimsonxyz \
+                --output table
+
   #             echo "Checking if resource grpup exists..."
   #             if ! az group show --name terraform-backend-rg --output none; then
   #               echo "Resource group not found. Creating..."
@@ -54,15 +68,10 @@ stages:
   #         displayName: 'Create Azure Resources'
 
 
-  - stage: Terraform
-    jobs:
-    - job: TerraformJob
-      steps:
-          - bash: az storage blob delete \
-                    --account-name storageaccjimsonxyz \
-                    --container-name storageaccpractisecontainer \
-                    --name kubernetes-dev.tfstate \
-                    --auth-mode login
+  # - stage: Terraform
+  #   jobs:
+  #   - job: TerraformJob
+  #     steps:
           # - task: DownloadSecureFile@1
           #   name: publickey
           #   inputs:
