@@ -48,7 +48,7 @@ stages:
               fi
               echo "Create storage container if it doesnot exist..."
               az storage container create \
-                --name \
+                --name storageaccpractisecontainer\
                 --account-name storageaccjimsonxyz \
                 --auth-mode login
           displayName: 'Create Azure Resources'
