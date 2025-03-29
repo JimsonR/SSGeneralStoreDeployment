@@ -24,7 +24,6 @@ stages:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              # Single-line command that works with Azure CLI 2.70.0
               az storage blob delete \
                 --container-name storageaccpractisecontainer \
                 --name kubernetes-dev.tfstate \
