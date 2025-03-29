@@ -14,44 +14,44 @@ variables:
   CLEAN_KEY_PATH: '$(Pipeline.Workspace)/sshkeys/cleaned_key.pub' 
 
 stages:
-  # - stage: Setup
-  #   jobs:
-  #   - job: AzureSetup
-  #     steps:
-  #       - task: AzureCLI@2
-  #         inputs:
-  #           azureSubscription: 'azure-resource-manager-service-connection'
-  #           scriptType: 'bash'
-  #           scriptLocation: 'inlineScript'
-  #           inlineScript: |
-  #             echo "Checking if resource grpup exists..."
-  #             if ! az group show --name terraform-backend-rg --output none; then
-  #               echo "Resource group not found. Creating..."
-  #               az group create --name terraform-backend-rg --location westeurope
-  #             else
-  #               echo "Resource group exists"
-  #             fi
-  #             echo "Checking if storage account exists"
-  #             if ! az storage account show --name storageaccjimsonxyz --resource-group terraform-backend-rg --output none; then
-  #               echo "Storage account not forun. Creating..."
-  #               az storage account create \
-  #                 --name storageaccjimsonxyz \
-  #                 --resource-group terraform-backend-rg \
-  #                 --sku Standard_RAGRS \
-  #                 --kind StorageV2 \
-  #                 --encryption-service blob \
-  #                 --https-only true \
-  #                 --allow-blob-public-access false \
-  #                 --min-tls-version TLS1_2
-  #             else
-  #               echo "Storage account exists."
-  #             fi
-  #             echo "Create storage container if it doesnot exist..."
-  #             az storage container create \
-  #               --name storageaccpractisecontainer\
-  #               --account-name storageaccjimsonxyz \
-  #               --auth-mode login
-  #         displayName: 'Create Azure Resources'
+  - stage: Setup
+    jobs:
+    - job: AzureSetup
+      steps:
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: 'azure-resource-manager-service-connection'
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              echo "Checking if resource grpup exists..."
+              if ! az group show --name terraform-backend-rg --output none; then
+                echo "Resource group not found. Creating..."
+                az group create --name terraform-backend-rg --location westeurope
+              else
+                echo "Resource group exists"
+              fi
+              echo "Checking if storage account exists"
+              if ! az storage account show --name storageaccjimsonxyz --resource-group terraform-backend-rg --output none; then
+                echo "Storage account not forun. Creating..."
+                az storage account create \
+                  --name storageaccjimsonxyz \
+                  --resource-group terraform-backend-rg \
+                  --sku Standard_RAGRS \
+                  --kind StorageV2 \
+                  --encryption-service blob \
+                  --https-only true \
+                  --allow-blob-public-access false \
+                  --min-tls-version TLS1_2
+              else
+                echo "Storage account exists."
+              fi
+              echo "Create storage container if it doesnot exist..."
+              az storage container create \
+                --name storageaccpractisecontainer\
+                --account-name storageaccjimsonxyz \
+                --auth-mode login
+          displayName: 'Create Azure Resources'
 
 
   - stage: Terraform
