@@ -124,6 +124,7 @@ stages:
               environmentServiceName: 'azure-resource-manager-service-connection'
               resourceAddress: 'azurerm_kubernetes_cluster.terraform-k8s'
               resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
+              commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(SSH_PUBLIC_KEY)"'
 
           - task: TerraformCLI@2
             inputs:
