@@ -64,10 +64,12 @@ stages:
             workingDirectory: '$(TF_WORKING_DIR)'
             backendType: 'azurerm'
             backendServiceArm: 'azure-resource-manager-service-connection'
+            backendAzureRmTenantId: '4d143b55-605d-4af2-a581-12ee448bba20'
             backendAzureRmResourceGroupName: 'terraform-backend-rg'
             backendAzureRmStorageAccountName: 'storageaccjimsonxyz'
             backendAzureRmContainerName: 'storageaccpractisecontainer'
             backendAzureRmKey: 'kubernetes-dev.tfstate'
+            allowTelemetryCollection: true
           # env:
           #   ARM_ACCESS_KEY: $(az storage account keys list \
           #     --resource-group terraform-backend-rg \
