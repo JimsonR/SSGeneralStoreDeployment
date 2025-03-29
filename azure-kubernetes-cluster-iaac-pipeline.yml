@@ -132,8 +132,8 @@ stages:
             resourceId: '/subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev'
           env:
             ARM_SUBSCRIPTION_ID: 'fbccdf0c-3db4-454b-a6f3-0713e306b7f5'
-            ARM_CLIENT_ID: $(client_id)
-            ARM_CLIENT_SECRET: $(client_secret)
+            ARM_CLIENT_ID: '$(client_id)'
+            ARM_CLIENT_SECRET: '$(client_secret)'
             ARM_TENANT_ID: '4d143b55-605d-4af2-a581-12ee448bba20'
 
         - task: TerraformCLI@2
