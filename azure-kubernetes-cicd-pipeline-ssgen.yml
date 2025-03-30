@@ -89,6 +89,8 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
+        rolloutStatusTimeout: '300s'  # 5 minute timeout
+        strategy: 'canary'
     - task: KubernetesManifest@1
       displayName: 'Deploy frontend'
       inputs:
