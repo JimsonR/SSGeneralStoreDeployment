@@ -20,14 +20,13 @@ spec:
         ports:
         - containerPort: 3306
         env:
-          - name: MYSQL_ROOT_PASSWORD
-            value: "1234"
-          - name: MYSQL_DATABASE
-            value: ssgenerals
-        volumeMounts:
-          - name: mysql-persistent-storage
-            mountPath: /var/lib/mysql
-    volumes:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "1234"
+        - name: MYSQL_DATABASE
+          value: ssgenerals
+        volumeMounts:  # Corrected from 'valueMounts' to 'volumeMounts'
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:  # Moved to same level as containers
       - name: mysql-persistent-storage
-        emptyDir: {}
-            
+        emptyDir: {}  # Corrected spelling from 'emptyDit'
