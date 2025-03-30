@@ -162,21 +162,31 @@ stages:
           env:
             ARM_ACCESS_KEY: $(STORAGE_KEY)
         - script: |
-            echo "Current working directory: $(pwd)"
-            echo "Terraform files in directory:"
-            ls -la $(TF_WORKING_DIR)/*.tf
+            cd $(TF_WORKING_DIR)
             
-            # Import resources with explicit working directory
-            terraform -chdir=$(TF_WORKING_DIR) import azurerm_resource_group.resource_group /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev || echo "Resource group may already be imported"
+            # Create temporary tfvars file with required variables
+            cat <<EOF > terraform.tfvars
+            client_id = "$(client_id)"
+            client_secret = "$(client_secret)"
+            ssh_public_key = "$(CLEAN_KEY_PATH)"
+            EOF
             
-            terraform -chdir=$(TF_WORKING_DIR) import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
+            echo "Temporary tfvars file contents:"
+            cat terraform.tfvars | sed 's/client_secret=.*/client_secret=***REDACTED***/'
+            
+            # Import resources
+            terraform import azurerm_resource_group.resource_group /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev
+            
+            terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
+            
+            # Clean up temporary file
+            rm terraform.tfvars
           displayName: 'Import Existing Resources'
           env:
             ARM_CLIENT_ID: $(client_id)
             ARM_CLIENT_SECRET: $(client_secret)
-            ARM_SSH_PUBLIC_KEY: $(CLEAN_KEY_PATH)
-            ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
-            ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
+            ARM_TENANT_ID: $(tenant_id)
+            ARM_SUBSCRIPTION_ID: $(subscription_id)
             ARM_ACCESS_KEY: $(STORAGE_KEY)
         - script: terraform -chdir=$(TF_WORKING_DIR) state list
           displayName: 'Verify Imported Resources'
