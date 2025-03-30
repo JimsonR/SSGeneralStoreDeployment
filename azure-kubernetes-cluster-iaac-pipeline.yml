@@ -190,10 +190,10 @@ stages:
             ARM_ACCESS_KEY: $(STORAGE_KEY)
         - script: terraform -chdir=$(TF_WORKING_DIR) state list
           displayName: 'Verify Imported Resources'
-  - stage: Deploy
-    jobs:
-    - job: Apply
-      steps:
+  # - stage: Deploy
+  #   jobs:
+  #   - job: Apply
+  #     steps:
         - task: TerraformCLI@2
           displayName: 'Terraform Plan'
           inputs:
