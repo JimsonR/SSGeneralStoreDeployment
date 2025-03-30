@@ -185,8 +185,8 @@ stages:
           env:
             ARM_CLIENT_ID: $(client_id)
             ARM_CLIENT_SECRET: $(client_secret)
-            ARM_TENANT_ID: $(tenant_id)
-            ARM_SUBSCRIPTION_ID: $(subscription_id)
+            ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
+            ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
             ARM_ACCESS_KEY: $(STORAGE_KEY)
         - script: terraform -chdir=$(TF_WORKING_DIR) state list
           displayName: 'Verify Imported Resources'
