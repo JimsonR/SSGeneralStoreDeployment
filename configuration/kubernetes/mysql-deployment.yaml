@@ -24,10 +24,10 @@ spec:
             value: "1234"
           - name: MYSQL_DATABASE
             value: ssgenerals
-        valueMounts:
+        volumeMounts:
           - name: mysql-persistent-storage
             mountPath: /var/lib/mysql
     volumes:
       - name: mysql-persistent-storage
-        emptyDit: {}
+        emptyDir: {}
             
