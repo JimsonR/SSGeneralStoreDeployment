@@ -200,7 +200,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(TF_WORKING_DIR)'
             environmentServiceName: 'azure-resource-manager-service-connection'
-            commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=1"'
+            commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=0"'
 
         - task: TerraformCLI@2
           displayName: 'Terraform Apply'
@@ -208,4 +208,4 @@ stages:
             command: 'apply'
             workingDirectory: '$(TF_WORKING_DIR)'
             environmentServiceName: 'azure-resource-manager-service-connection'
-            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=1"'
+            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=0"'
