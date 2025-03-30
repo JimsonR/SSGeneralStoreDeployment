@@ -1,4 +1,4 @@
 export const environment = {
     production : true,
-    api: "http://ec2-13-126-234-177.ap-south-1.compute.amazonaws.com/api"  
+    api: "https://prodtest-dev-123456.hcp.southcentralus.azmk8s.io/api"
 }

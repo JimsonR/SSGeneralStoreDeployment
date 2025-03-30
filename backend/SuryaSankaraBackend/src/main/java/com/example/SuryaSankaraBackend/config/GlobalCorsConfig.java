@@ -13,8 +13,7 @@ public class GlobalCorsConfig {
     public CorsFilter corsFilter(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("http://ec2-13-126-234-177.ap-south-1.compute.amazonaws.com");
-
+        corsConfiguration.addAllowedOrigin("https://prodtest-dev-123456.hcp.southcentralus.azmk8s.io");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);
