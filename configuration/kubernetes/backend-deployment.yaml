@@ -21,6 +21,10 @@ spec:
       labels:
         app: ssgenerals-backend
     spec:
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mysql.default.svc.cluster.local 3306; do echo "Waiting for MySQL"; sleep 2; done']
       containers:
       - name: ssgenerals-backend
         image: jimsonrats/ssgenerals-backend
@@ -36,37 +40,38 @@ spec:
         - name: SPRING_DATASOURCE_PASSWORD
           value: "1234"
         - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-          value: validate  # Changed from update
+          value: validate
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
-          value: "health,info"  # Ensure health endpoint is exposed
+          value: "health,info"
+        - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+          value: "30000"
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          value: "5"
         resources:
-          requests:
-            cpu: 200m
-            memory: 512Mi
           limits:
-            cpu: 1000m
-            memory: 1024Mi
-        startupProbe:  # Added startup probe
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        startupProbe:
           httpGet:
             path: /actuator/health
             port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
           failureThreshold: 30
-          periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /actuator/health
+            path: /actuator/health/readiness
             port: http
-          initialDelaySeconds: 20  # Reduced from 60
+          initialDelaySeconds: 20
           periodSeconds: 5
           timeoutSeconds: 3
-          successThreshold: 1
-          failureThreshold: 3
         livenessProbe:
           httpGet:
-            path: /actuator/health
+            path: /actuator/health/liveness
             port: http
-          initialDelaySeconds: 30
+          initialDelaySeconds: 45
           periodSeconds: 10
-          timeoutSeconds: 3
-          failureThreshold: 3
       terminationGracePeriodSeconds: 60
