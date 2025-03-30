@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: jimsonrats/ssgenerals-frontend:latest
+        image: jimsonrats/ssgenerals-frontend
         ports:
         - containerPort: 80
         env:
