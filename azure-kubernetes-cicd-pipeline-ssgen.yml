@@ -79,6 +79,7 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
         containers: '$(mysqlImage)'
+        arguments: '--timeout=300s'
     
     - task: KubernetesManifest@1
       displayName: 'Deploy Backend'
@@ -89,7 +90,8 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
-        rolloutStatusTimeout: '300s'  # 5 minute timeout
+        # rolloutStatusTimeout: '300s'  # 5 minute timeout
+        arguments: '--timeout=300s'
         strategy: 'canary'
     - task: KubernetesManifest@1
       displayName: 'Deploy frontend'
