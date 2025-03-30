@@ -174,14 +174,20 @@ stages:
             echo "Temporary tfvars file contents:"
             cat terraform.tfvars | sed 's/client_secret=.*/client_secret=***REDACTED***/'
             
-            # Import resources
-            terraform import azurerm_resource_group.resource_group /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev
+            # Conditional resource group import
+            echo "Attempting to import resource group..."
+            terraform import azurerm_resource_group.resource_group /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/kubepractise_dev || echo "Resource group import failed or already exists - continuing"
             
-            terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/fbccdf0c-3db4-454b-a6f3-0713e306b7f5/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev
-            
+            # Conditional AKS cluster import
+            echo "Attempting to import AKS cluster..."
+            terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev || echo "AKS cluster import failed or already exists - continuing"
+           
             # Clean up temporary file
-            rm terraform.tfvars
-          displayName: 'Import Existing Resources'
+            # rm terraform.tfvars
+            echo "Current state:"
+            terraform state list
+            displayName: 'Conditional Resource Import'
+          # displayName: 'Import Existing Resources'
           env:
             ARM_CLIENT_ID: $(client_id)
             ARM_CLIENT_SECRET: $(client_secret)
@@ -189,30 +195,30 @@ stages:
             ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
             ARM_ACCESS_KEY: $(STORAGE_KEY)
         - script: terraform -chdir=$(TF_WORKING_DIR) state list
-          displayName: 'Verify Imported Resources'
+          # displayName: 'Verify Imported Resources'
   # - stage: Deploy
   #   jobs:
   #   - job: Apply
   #     steps:
-        # - task: TerraformCLI@2
-        #   displayName: 'Terraform Plan'
-        #   inputs:
-        #     command: 'plan'
-        #     workingDirectory: '$(TF_WORKING_DIR)'
-        #     environmentServiceName: 'azure-resource-manager-service-connection'
-        #     commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=0"'
-
-        # - task: TerraformCLI@2
-        #   displayName: 'Terraform Apply'
-        #   inputs:
-        #     command: 'apply'
-        #     workingDirectory: '$(TF_WORKING_DIR)'
-        #     environmentServiceName: 'azure-resource-manager-service-connection'
-        #     commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=0"'
-
         - task: TerraformCLI@2
+          displayName: 'Terraform Plan'
           inputs:
-            command: 'destroy'
+            command: 'plan'
             workingDirectory: '$(TF_WORKING_DIR)'
             environmentServiceName: 'azure-resource-manager-service-connection'
-            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" '
+            commandOptions: '-var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=2"'
+
+        - task: TerraformCLI@2
+          displayName: 'Terraform Apply'
+          inputs:
+            command: 'apply'
+            workingDirectory: '$(TF_WORKING_DIR)'
+            environmentServiceName: 'azure-resource-manager-service-connection'
+            commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" -var="node_count=2"'
+
+        # - task: TerraformCLI@2
+        #   inputs:
+        #     command: 'destroy'
+        #     workingDirectory: '$(TF_WORKING_DIR)'
+        #     environmentServiceName: 'azure-resource-manager-service-connection'
+        #     commandOptions: '-auto-approve -var="client_id=$(client_id)" -var="client_secret=$(client_secret)" -var="ssh_public_key=$(CLEAN_KEY_PATH)" '
