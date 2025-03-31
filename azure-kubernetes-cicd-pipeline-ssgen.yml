@@ -90,8 +90,8 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
-      arguments: '--wait=false'  # 👈 Critical change
-      strategy: 'none'  # Skip rollout status checks
+        arguments: '--wait=false'  # 👈 Critical change
+        strategy: 'none'  # Skip rollout status checks
     - task: KubernetesManifest@1
       displayName: 'Deploy frontend'
       inputs:
