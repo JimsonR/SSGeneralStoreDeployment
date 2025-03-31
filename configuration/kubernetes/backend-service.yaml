@@ -15,4 +15,4 @@ spec:
     app: ssgenerals-backend
   sessionAffinity: None #CHANGE
   # type: LoadBalancer
-    type: ClusterIP  # 👈 Internal-only access
+  type: ClusterIP  # 👈 Internal-only access
