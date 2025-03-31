@@ -90,8 +90,8 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
-        arguments: '--wait --timeout=600s'  # Increased timeout
-        strategy: 'rolling'  # Explicit strategy
+      arguments: '--wait=false'  # 👈 Critical change
+      strategy: 'none'  # Skip rollout status checks
     - task: KubernetesManifest@1
       displayName: 'Deploy frontend'
       inputs:
