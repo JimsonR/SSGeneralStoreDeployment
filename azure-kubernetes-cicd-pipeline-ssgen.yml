@@ -92,7 +92,7 @@ stages:
         containers: '$(backendImage)'
         # rolloutStatusTimeout: '300s'  # 5 minute timeout
         arguments: '--timeout=300s'
-        strategy: 'canary'
+        # strategy: 'canary'
     - task: KubernetesManifest@1
       displayName: 'Deploy frontend'
       inputs:
