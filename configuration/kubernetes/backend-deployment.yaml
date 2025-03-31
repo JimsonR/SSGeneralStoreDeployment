@@ -34,13 +34,13 @@ spec:
           name: http
         env:
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:mysql://mysql.default.svc.cluster.local:3306/ssgenerals?useSSL=false&allowPublicKeyRetrieval=true"
+          value: "jdbc:mysql://mysql:3306/ssgenerals?useSSL=false&allowPublicKeyRetrieval=true"
         - name: SPRING_DATASOURCE_USERNAME
           value: root
         - name: SPRING_DATASOURCE_PASSWORD
           value: "1234"
         - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-          value: update  
+          value: update
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
           value: "health,info"
         - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
@@ -58,9 +58,9 @@ spec:
           httpGet:
             path: /actuator/health
             port: http
-          initialDelaySeconds: 30
+          initialDelaySeconds: 45
           periodSeconds: 5
-          failureThreshold: 60
+          failureThreshold: 80
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
