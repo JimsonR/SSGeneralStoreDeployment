@@ -80,7 +80,17 @@ stages:
         manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
         containers: '$(mysqlImage)'
         arguments: '--timeout=300s'
-    
+        # Add MySQL readiness check
+    - task: Bash@3
+      displayName: 'Wait for MySQL'
+      timeoutInMinutes: 5
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "Waiting for MySQL to be ready..."
+          kubectl wait --for=condition=Ready pod -l app=mysql --timeout=300s
+          kubectl exec $(kubectl get pod -l app=mysql -o name) -- \
+            mysqladmin ping -uroot -p1234 || exit 1
     - task: KubernetesManifest@1
       displayName: 'Deploy Backend'
       inputs:
@@ -92,6 +102,16 @@ stages:
         containers: '$(backendImage)'
         arguments: '--wait=false'  # 👈 Critical change
         strategy: 'none'  # Skip rollout status checks
+            # Verification Step
+    - task: Bash@3
+      displayName: 'Verify Backend'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "Checking backend status..."
+          kubectl get pods -l app=ssgenerals-backend -o wide
+          kubectl logs -l app=ssgenerals-backend --tail=50
+          echo "Proceeding with deployment..."
     - task: KubernetesManifest@1
       displayName: 'Deploy frontend'
       inputs:
