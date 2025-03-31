@@ -40,7 +40,7 @@ spec:
         - name: SPRING_DATASOURCE_PASSWORD
           value: "1234"
         - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-          value: validate
+          value: update  
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
           value: "health,info"
         - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
@@ -58,9 +58,9 @@ spec:
           httpGet:
             path: /actuator/health
             port: http
-          initialDelaySeconds: 5
+          initialDelaySeconds: 30
           periodSeconds: 5
-          failureThreshold: 30
+          failureThreshold: 60
         readinessProbe:
           httpGet:
             path: /actuator/health/readiness
