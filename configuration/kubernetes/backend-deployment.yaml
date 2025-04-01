@@ -7,6 +7,7 @@ metadata:
   namespace: default
 spec:
   replicas: 1
+  progressDeadlineSeconds: 600  # Explicitly set (default: 600s)
   minReadySeconds: 30
   selector:
     matchLabels:
@@ -22,56 +23,57 @@ spec:
         app: ssgenerals-backend
     spec:
       initContainers:
-      - name: wait-for-mysql
-        image: busybox:1.28
-        command: ['sh', '-c', 'until nc -z mysql.default.svc.cluster.local 3306; do echo "Waiting for MySQL"; sleep 2; done']
+        - name: wait-for-mysql
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nc -z mysql.default.svc.cluster.local 3306; do echo "Waiting for MySQL"; sleep 2; done']
       containers:
-      - name: ssgenerals-backend
-        image: jimsonrats/ssgenerals-backend
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 8080
-          name: http
-        env:
-        - name: SPRING_DATASOURCE_URL
-          value: "jdbc:mysql://mysql:3306/ssgenerals?useSSL=false&allowPublicKeyRetrieval=true"
-        - name: SPRING_DATASOURCE_USERNAME
-          value: root
-        - name: SPRING_DATASOURCE_PASSWORD
-          value: "1234"
-        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-          value: update
-        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
-          value: "health,info"
-        - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
-          value: "30000"
-        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
-          value: "5"
-        resources:
-          limits:
-            cpu: "2"
-            memory: "2Gi"
-          requests:
-            cpu: "500m"
-            memory: "512Mi"
-        startupProbe:
-          httpGet:
-            path: /actuator/health
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          failureThreshold: 30
-        readinessProbe:
-          httpGet:
-            path: /actuator/health/readiness
-            port: http
-          initialDelaySeconds: 60
-          periodSeconds: 5
-          timeoutSeconds: 3
-        livenessProbe:
-          httpGet:
-            path: /actuator/health/liveness
-            port: http
-          initialDelaySeconds: 90
-          periodSeconds: 10
+        - name: ssgenerals-backend
+          image: jimsonrats/ssgenerals-backend
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql.default.svc.cluster.local:3306/ssgenerals?useSSL=false&allowPublicKeyRetrieval=true"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health,info"
+            - name: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+              value: "30000"
+            - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+              value: "5"
+          resources:
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+          # --- Probes ---
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 20  # Reduced from 30s (Spring Boot starts in ~6s)
+            periodSeconds: 5
+            failureThreshold: 10     # Allow 10 attempts (50s total)
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 30  # Reduced from 60s (align with startup)
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 60  # Keep higher to avoid false positives
+            periodSeconds: 10
       terminationGracePeriodSeconds: 60
