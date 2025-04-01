@@ -80,6 +80,7 @@ stages:
         manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
         containers: '$(mysqlImage)'
         arguments: '--timeout=300s'
+        
         # Add MySQL readiness check
     # - task: Bash@3
     #   displayName: 'Wait for MySQL'
