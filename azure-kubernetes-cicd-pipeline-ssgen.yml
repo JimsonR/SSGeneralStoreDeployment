@@ -101,8 +101,6 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
-        arguments: '--wait=false'  # 👈 Critical change
-        strategy: 'canary'  # Skip rollout status checks
             # Verification Step
     # - task: Bash@3
     #   displayName: 'Verify Backend'
