@@ -4,6 +4,7 @@ import { WishlistService } from '../../services/wishlist.service';
 import { CartItemModel } from '../../models/CartItemModel';
 import { CartService } from '../../services/cart.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '../../../environments/enviroment.prod';
 
 @Component({
   selector: 'app-product-card',
@@ -16,6 +17,7 @@ export class ProductCardComponent {
 @Input() product! : ProductModel
 @Output() wishlistCountChange= new EventEmitter<number>;
 
+url = environment.api
 
 
 itemAndPrice: { value: number; label: string }[] = [];
