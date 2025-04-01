@@ -1,6 +1,7 @@
 <!-- Product Card -->
 <div class="card me-3" >
-    <img [src]="'http://localhost:8080/'+product.imageUrl.substring(8)"   class="card-img-top" alt="{{product.name}}" 
+    <img src="{{url}}{{product.imageUrl.substring(8)}}"
+    class="card-img-top" alt="{{product.name}}" 
     style="object-fit: cover;">
     <span class="badge position-absolute" style="top: 10px; left: 10px"><div class="ribbon">
       <span >-70%</span>
