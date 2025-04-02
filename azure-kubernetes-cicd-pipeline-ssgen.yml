@@ -70,16 +70,16 @@ stages:
         itemPattern: '**/*.yaml'
         targetPath: '$(System.ArtifactsDirectory)/manifests'
 
-    # - task: KubernetesManifest@1
-    #   displayName: 'Deploy MySQL'
-    #   inputs:
-    #     action: 'deploy'
-    #     connectionType: 'kubernetesServiceConnection'
-    #     kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
-    #     namespace: '$(k8sNamespace)'
-    #     manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
-    #     containers: '$(mysqlImage)'
-    #     arguments: '--timeout=300s'
+    - task: KubernetesManifest@1
+      displayName: 'Deploy MySQL'
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
+        namespace: '$(k8sNamespace)'
+        manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
+        containers: '$(mysqlImage)'
+        arguments: '--timeout=300s'
         
         # Add MySQL readiness check
     # - task: Bash@3
