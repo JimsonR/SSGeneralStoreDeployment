@@ -1,11 +1,18 @@
 <!-- Product Card -->
 <div class="card me-3" >
-    <img [src]="url + '/uploads' + product.imageUrl.substring(8)"
+    <!-- <img [src]="url + '/uploads' + product.imageUrl
+    .substring(8)
+    "
+    class="card-img-top" alt="{{product.name}}" 
+    style="object-fit: cover;"> -->
+    <img [src]="url + product.imageUrl
+    .substring(8)
+    "
     class="card-img-top" alt="{{product.name}}" 
     style="object-fit: cover;">
     <span class="badge position-absolute" style="top: 10px; left: 10px"><div class="ribbon">
       <span >-70%</span>
-    </div></span>
+    </div></span> m  
     <h2>
     <span class="badge position-absolute fs-6" style="top: 10px; right: 10px; ; background-color:#fd0804">Best Seller</span>
   </h2>

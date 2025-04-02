@@ -16,7 +16,8 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("api/images")
 public class ImageUploadController {
-    private static final String UPLOAD_DIR = "uploads/";
+//    private static final String UPLOAD_DIR = "uploads/";
+    private static final String UPLOAD_DIR = "/var/www/uploads/";
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file) {
@@ -35,7 +36,7 @@ public class ImageUploadController {
             Files.write(filePath, file.getBytes());
 
             // Return the full URL (assuming static folder configuration)
-            String imageUrl = "/uploads/" + fileName;
+            String imageUrl = "/api/uploads/" + fileName;
             return ResponseEntity.ok(imageUrl);
 
         } catch (IOException e) {
