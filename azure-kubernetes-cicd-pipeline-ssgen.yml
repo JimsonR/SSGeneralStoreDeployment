@@ -32,26 +32,26 @@ stages:
           command: 'buildAndPush'
           Dockerfile: '**/Dockerfile.backend'
           tags: '$(tag)'
-      # - task: Docker@2
-      #   displayName: 'Build Frontend Image'
-      #   inputs:
-      #     containerRegistry: 'jimson-docker-hub'
-      #     repository: 'jimsonrats/ssgenerals-frontend'
-      #     command: 'buildAndPush'
-      #     Dockerfile: '**/Dockerfile.frontend'
-      #     tags: '$(tag)'
-      # - task: CopyFiles@2
-      #   displayName: 'Copy Kubernetes Manifests'
-      #   inputs:
-      #     SourceFolder: '$(System.DefaultWorkingDirectory)/configuration/kubernetes'
-      #     Contents: '**/*.yaml'
-      #     TargetFolder: '$(Build.ArtifactStagingDirectory)/manifests'
-      # - task: PublishBuildArtifacts@1
-      #   displayName: 'Publish Manifests'
-      #   inputs:
-      #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      #     ArtifactName: 'manifests'
-      #     publishLocation: 'Container'  # Stage 1 is done 
+      - task: Docker@2
+        displayName: 'Build Frontend Image'
+        inputs:
+          containerRegistry: 'jimson-docker-hub'
+          repository: 'jimsonrats/ssgenerals-frontend'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile.frontend'
+          tags: '$(tag)'
+      - task: CopyFiles@2
+        displayName: 'Copy Kubernetes Manifests'
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)/configuration/kubernetes'
+          Contents: '**/*.yaml'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/manifests'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Manifests'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'manifests'
+          publishLocation: 'Container'  # Stage 1 is done 
           
 - stage: Deploy
   displayName: Deploy image
