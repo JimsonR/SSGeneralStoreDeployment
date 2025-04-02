@@ -19,7 +19,7 @@ private String uploadDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/api/**") // Changed to match your URL pattern
+        registry.addResourceHandler("/api/uploads/**") // Match the URL pattern you want to use
                 .addResourceLocations("file:" + uploadDir + "/")
                 .setCachePeriod(3600)
                 .resourceChain(true)

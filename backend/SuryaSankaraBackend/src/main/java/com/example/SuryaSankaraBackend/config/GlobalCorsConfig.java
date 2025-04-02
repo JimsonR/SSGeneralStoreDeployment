@@ -14,7 +14,7 @@ public class GlobalCorsConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         // corsConfiguration.addAllowedOrigin("https://prodtest-dev-123456.hcp.southcentralus.azmk8s.io");
-        corsConfiguration.addAllowedOrigin("http://74.178.214.79");
+        corsConfiguration.addAllowedOrigin("http://50.85.71.154");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);
