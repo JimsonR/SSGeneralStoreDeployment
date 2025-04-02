@@ -5,7 +5,7 @@
     "
     class="card-img-top" alt="{{product.name}}" 
     style="object-fit: cover;"> -->
-    <img [src]="url + product.imageUrl"
+    <img [src]="product.imageUrl.substring"
     class="card-img-top" alt="{{product.name}}" 
     style="object-fit: cover;">
     <span class="badge position-absolute" style="top: 10px; left: 10px"><div class="ribbon">
