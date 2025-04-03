@@ -8,7 +8,7 @@
     <div *ngFor="let item of cartItems" class="card mb-3">
         <div class="row g-0">
             <div class="col-md-2">
-                <img [src]="'http://localhost:8080'+item.productImg" alt="{{ item.productName }}" class="img-fluid rounded-start">
+                <img [src]="item.productImg" alt="{{ item.productName }}" class="img-fluid rounded-start">
             </div>
 
             <div class="col-md-10">
