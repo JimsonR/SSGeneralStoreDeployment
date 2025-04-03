@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CartItemModel } from '../models/CartItemModel';
 import { CartService } from '../services/cart.service';
+import { environment } from '../../environments/enviroment.prod';
 
 @Component({
   selector: 'app-cart',
@@ -9,6 +10,10 @@ import { CartService } from '../services/cart.service';
   styleUrl: './cart.component.scss'
 })
 export class CartComponent {
+
+  url = environment.api
+  
+
 cartItems : CartItemModel[] = []
 
 constructor(private cartService : CartService){}
