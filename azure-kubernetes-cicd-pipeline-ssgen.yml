@@ -24,14 +24,14 @@ stages:
       vmImage: ubuntu-latest
       # name: Test Agent
     steps:
-      # - task: Docker@2
-      #   displayName: 'Build Backend Image'
-      #   inputs:
-      #     containerRegistry: 'jimson-docker-hub'
-      #     repository: 'jimsonrats/ssgenerals-backend'
-      #     command: 'buildAndPush'
-      #     Dockerfile: '**/Dockerfile.backend'
-      #     tags: '$(tag)'
+      - task: Docker@2
+        displayName: 'Build Backend Image'
+        inputs:
+          containerRegistry: 'jimson-docker-hub'
+          repository: 'jimsonrats/ssgenerals-backend'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile.backend'
+          tags: '$(tag)'
       - task: Docker@2
         displayName: 'Build Frontend Image'
         inputs:
@@ -70,16 +70,16 @@ stages:
         itemPattern: '**/*.yaml'
         targetPath: '$(System.ArtifactsDirectory)/manifests'
 
-    # - task: KubernetesManifest@1
-    #   displayName: 'Deploy MySQL'
-    #   inputs:
-    #     action: 'deploy'
-    #     connectionType: 'kubernetesServiceConnection'
-    #     kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
-    #     namespace: '$(k8sNamespace)'
-    #     manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
-    #     containers: '$(mysqlImage)'
-    #     arguments: '--timeout=300s'
+    - task: KubernetesManifest@1
+      displayName: 'Deploy MySQL'
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
+        namespace: '$(k8sNamespace)'
+        manifests: '$(System.ArtifactsDirectory)/manifests/mysql-*.yaml'
+        containers: '$(mysqlImage)'
+        arguments: '--timeout=300s'
         
         # Add MySQL readiness check
     # - task: Bash@3
@@ -92,15 +92,15 @@ stages:
     #       kubectl wait --for=condition=Ready pod -l app=mysql --timeout=300s
     #       kubectl exec $(kubectl get pod -l app=mysql -o name) -- \
     #         mysqladmin ping -uroot -p1234 || exit 1
-    # - task: KubernetesManifest@1
-    #   displayName: 'Deploy Backend'
-    #   inputs:
-    #     action: 'deploy'
-    #     connectionType: 'kubernetesServiceConnection'
-    #     kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
-    #     namespace: '$(k8sNamespace)'
-    #     manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
-    #     containers: '$(backendImage)'
+    - task: KubernetesManifest@1
+      displayName: 'Deploy Backend'
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
+        namespace: '$(k8sNamespace)'
+        manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
+        containers: '$(backendImage)'
             # Verification Step
     # - task: Bash@3
     #   displayName: 'Verify Backend'
@@ -122,7 +122,7 @@ stages:
         containers: '$(frontendImage)'
         arguments: '--timeout=300s'
 
-    # # Get Frontend Service URL
+    # Get Frontend Service URL
     # - task: Bash@3
     #   displayName: 'Get Frontend URL'
     #   inputs:
