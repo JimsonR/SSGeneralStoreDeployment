@@ -18,16 +18,17 @@ public class ProductController {
 
     @PostMapping("/upsert")
     public ResponseEntity<String> upsertProduct(@RequestBody ProductRequest productRequest){
-        return ResponseEntity.ok(productService.upsertProduct(productRequest));
+        return ResponseEntity.ok(productService.saveProduct(productRequest));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProductResponse>> allProducts(){
-        return ResponseEntity.ok(productService.allProducts());
+    public ResponseEntity<List<ProductResponse>> allProducts(@RequestParam int pgNo , @RequestParam int pgSize){
+        return ResponseEntity.ok(productService.getAllProducts( pgNo , pgSize));
+
     }
 
-    @GetMapping("/all/product-detail")
-    public ResponseEntity<ProductResponse> getProduct(@RequestParam long id){
-        return ResponseEntity.ok(productService.getProduct(id));
-    }
+//    @GetMapping("/all/product-detail")
+//    public ResponseEntity<ProductResponse> getProduct(@RequestParam long id){
+//        return ResponseEntity.ok(productService.getProduct(id));
+//    }
 }

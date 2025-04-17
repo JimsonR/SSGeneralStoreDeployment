@@ -2,10 +2,10 @@
 services:
 
   backend: 
-    # build: 
-      # context: .
-      # dockerfile: Dockerfile.backend
-    image: jimsonrats/ssgenerals-backend:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    # image: jimsonrats/ssgenerals-backend:latest
 
     ports:
       - "8080:8080"
@@ -29,10 +29,10 @@ services:
   #   - app-network
 
   frontend:
-    # build: 
-      # context: .
-      # dockerfile: Dockerfile.frontend
-    image: jimsonrats/ssgenerals-frontend:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile.frontend
+    # image: jimsonrats/ssgenerals-frontend:latest
 
     ports:
       - "80:80"

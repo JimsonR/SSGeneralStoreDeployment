@@ -56,18 +56,34 @@ public class ImageUploadController {
 
 
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file) {
-        try {
-            String imageUrl = blobStorageService.uploadFile(file);
+//    @PostMapping("/upload")
+//    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file) {
+//        try {
+//            String imageUrl = blobStorageService.uploadFile(file);
+//
+//            // Save metadata to Cosmos DB
+//            ImageEntity imageEntity = new ImageEntity(UUID.randomUUID().toString(), imageUrl, "Jyothika");
+//            imageRepository.save(imageEntity);
+//
+//            return ResponseEntity.ok(imageUrl);
+//        } catch (IOException e) {
+//            return ResponseEntity.badRequest().body("Failed to upload image");
+//        }
+//    }
+@PostMapping("/upload")
+public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file ,
+                                          @RequestParam String category) {
+    try {
+        String imageUrl = blobStorageService.uploadFile(file,category);
 
-            // Save metadata to Cosmos DB
-            ImageEntity imageEntity = new ImageEntity(UUID.randomUUID().toString(), imageUrl, "Jyothika");
-            imageRepository.save(imageEntity);
+        // Save metadata to Cosmos DB
+        ImageEntity imageEntity = new ImageEntity(UUID.randomUUID().toString(), imageUrl, "Jyothika");
+        imageRepository.save(imageEntity);
 
-            return ResponseEntity.ok(imageUrl);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Failed to upload image");
-        }
+        return ResponseEntity.ok(imageUrl);
+    } catch (IOException e) {
+        return ResponseEntity.badRequest().body("Failed to upload image");
     }
+}
+
 }
