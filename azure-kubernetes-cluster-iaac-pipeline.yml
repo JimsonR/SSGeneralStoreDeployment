@@ -143,6 +143,11 @@ stages:
             echo "$PUBLIC_KEY_CONTENT" > $(CLEAN_KEY_PATH)
             echo "##vso[task.setvariable variable=SSH_PUBLIC_KEY]$(cat $(CLEAN_KEY_PATH))"
           displayName: 'Prepare SSH Key'
+        - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+          displayName: 'Install Terraform'
+          inputs:
+            terraformVersion: 'latest'  # or whichever version you want
+
 
   # - stage: Import
   #   jobs:
