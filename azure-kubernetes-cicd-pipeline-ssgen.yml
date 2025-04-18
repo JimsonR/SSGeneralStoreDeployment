@@ -101,6 +101,9 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
+        secretArguments: |
+          --set secrets.azureStorageKey=$(AZURE_STORAGE_KEY) \
+          --set secrets.azureCosmosKey=$(AZURE_COSMOS_KEY)
             # Verification Step
     # - task: Bash@3
     #   displayName: 'Verify Backend'
