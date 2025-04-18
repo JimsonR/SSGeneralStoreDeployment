@@ -48,6 +48,16 @@ spec:
               value: "30000"
             - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
               value: "5"
+            - name: AZURE_STORAGE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: azureStorageKey
+            - name: AZURE_COSMOS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: azureCosmosKey
           resources:
             limits:
               cpu: "2"
