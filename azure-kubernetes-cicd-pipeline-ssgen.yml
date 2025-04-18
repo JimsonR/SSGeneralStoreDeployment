@@ -92,6 +92,16 @@ stages:
     #       kubectl wait --for=condition=Ready pod -l app=mysql --timeout=300s
     #       kubectl exec $(kubectl get pod -l app=mysql -o name) -- \
     #         mysqladmin ping -uroot -p1234 || exit 1
+        # First ensure secrets exist
+    - bash: |
+        kubectl create secret generic azure-secrets \
+          --from-literal=azureStorageKey=$(AZURE_STORAGE_KEY) \
+          --from-literal=azureCosmosKey=$(AZURE_COSMOS_KEY) \
+          --namespace=$(k8sNamespace) --dry-run=client -o yaml | kubectl apply -f -
+      displayName: 'Create Azure Secrets'
+      env:
+        AZURE_STORAGE_KEY: $(AZURE_STORAGE_KEY)
+        AZURE_COSMOS_KEY: $(AZURE_COSMOS_KEY)
     - task: KubernetesManifest@1
       displayName: 'Deploy Backend'
       inputs:
@@ -101,9 +111,9 @@ stages:
         namespace: '$(k8sNamespace)'
         manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
         containers: '$(backendImage)'
-        secretArguments: |
-          --set secrets.azureStorageKey=$(AZURE_STORAGE_KEY) \
-          --set secrets.azureCosmosKey=$(AZURE_COSMOS_KEY)
+        # secretArguments: |
+        #   --set secrets.azureStorageKey=$(AZURE_STORAGE_KEY) \
+        #   --set secrets.azureCosmosKey=$(AZURE_COSMOS_KEY)
             # Verification Step
     # - task: Bash@3
     #   displayName: 'Verify Backend'
