@@ -92,7 +92,14 @@ stages:
     #       kubectl wait --for=condition=Ready pod -l app=mysql --timeout=300s
     #       kubectl exec $(kubectl get pod -l app=mysql -o name) -- \
     #         mysqladmin ping -uroot -p1234 || exit 1
-        # First ensure secrets exist
+            # First ensure secrets exist
+    - task: Kubernetes@1
+      displayName: 'Set Kubernetes Context'
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'azure-kubernetes-ssgenerals-connenction'
+        command: 'config'
+
     - bash: |
         kubectl create secret generic azure-secrets \
           --from-literal=azureStorageKey=$(AZURE_STORAGE_KEY) \
@@ -102,6 +109,7 @@ stages:
       env:
         AZURE_STORAGE_KEY: $(AZURE_STORAGE_KEY)
         AZURE_COSMOS_KEY: $(AZURE_COSMOS_KEY)
+
     - task: KubernetesManifest@1
       displayName: 'Deploy Backend'
       inputs:
