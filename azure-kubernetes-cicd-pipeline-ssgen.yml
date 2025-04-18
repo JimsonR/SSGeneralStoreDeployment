@@ -97,7 +97,7 @@ stages:
         kubectl create secret generic azure-secrets \
           --from-literal=azureStorageKey=$(AZURE_STORAGE_KEY) \
           --from-literal=azureCosmosKey=$(AZURE_COSMOS_KEY) \
-          --namespace=$(k8sNamespace) --dry-run=client -o yaml | kubectl apply -f -
+          --namespace=$(k8sNamespace) --dry-run=client -o yaml | kubectl apply -f - --validate=false
       displayName: 'Create Azure Secrets'
       env:
         AZURE_STORAGE_KEY: $(AZURE_STORAGE_KEY)
