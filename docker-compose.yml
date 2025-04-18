@@ -2,17 +2,10 @@
 services:
 
   backend: 
-<<<<<<< HEAD
     build: 
       context: .
       dockerfile: Dockerfile.backend
     # image: jimsonrats/ssgenerals-backend:latest
-=======
-    # build: 
-      # context: .
-      # dockerfile: Dockerfile.backend
-    image: jimsonrats/ssgenerals-backend:latest
->>>>>>> ea1b4e18ccd3e1fe91d3b022503e939306904569
 
     ports:
       - "8080:8080"
@@ -36,17 +29,10 @@ services:
   #   - app-network
 
   frontend:
-<<<<<<< HEAD
     build: 
       context: .
       dockerfile: Dockerfile.frontend
     # image: jimsonrats/ssgenerals-frontend:latest
-=======
-    # build: 
-      # context: .
-      # dockerfile: Dockerfile.frontend
-    image: jimsonrats/ssgenerals-frontend:latest
->>>>>>> ea1b4e18ccd3e1fe91d3b022503e939306904569
 
     ports:
       - "80:80"

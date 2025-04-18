@@ -56,10 +56,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-<<<<<<< HEAD
 			<scope>provided</scope>
-=======
->>>>>>> ea1b4e18ccd3e1fe91d3b022503e939306904569
 		</dependency>
         <dependency>
             <groupId>com.azure</groupId>

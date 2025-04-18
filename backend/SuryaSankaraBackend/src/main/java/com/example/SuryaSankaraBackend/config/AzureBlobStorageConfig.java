@@ -16,6 +16,9 @@ public class AzureBlobStorageConfig {
     @Value("${azure.storage.container-name}")
     private String containerName;
 
+    @Value("${azure.storage.account-name}")
+    private String accountName;
+
     @Bean
     public BlobServiceClient blobServiceClient() {
         return new BlobServiceClientBuilder()
@@ -30,6 +33,12 @@ public class AzureBlobStorageConfig {
             client.create();
         }
         return client;
+    }
+    @Bean
+    public String storageBaseUrl() {
+        // Automatically resolves to geographic endpoint
+        return String.format("https://%s.z.web.core.windows.net/%s",
+                accountName, containerName);
     }
 
 }
