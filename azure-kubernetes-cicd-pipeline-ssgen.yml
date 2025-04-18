@@ -93,15 +93,6 @@ stages:
     #       kubectl exec $(kubectl get pod -l app=mysql -o name) -- \
     #         mysqladmin ping -uroot -p1234 || exit 1
         # First ensure secrets exist
-    - task: KubernetesManifest@1
-      displayName: 'Deploy Backend'
-      inputs:
-        action: 'deploy'
-        connectionType: 'kubernetesServiceConnection'
-        kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
-        namespace: '$(k8sNamespace)'
-        manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
-        containers: '$(backendImage)'
     - bash: |
         kubectl create secret generic azure-secrets \
           --from-literal=azureStorageKey=$(AZURE_STORAGE_KEY) \
@@ -111,6 +102,16 @@ stages:
       env:
         AZURE_STORAGE_KEY: $(AZURE_STORAGE_KEY)
         AZURE_COSMOS_KEY: $(AZURE_COSMOS_KEY)
+    - task: KubernetesManifest@1
+      displayName: 'Deploy Backend'
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
+        namespace: '$(k8sNamespace)'
+        manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
+        containers: '$(backendImage)'
+
 
         # secretArguments: |
         #   --set secrets.azureStorageKey=$(AZURE_STORAGE_KEY) \
