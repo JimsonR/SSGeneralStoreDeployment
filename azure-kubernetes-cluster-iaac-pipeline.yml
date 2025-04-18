@@ -166,41 +166,41 @@ stages:
             backendAzureRmKey: 'kubernetes-dev.tfstate'
           env:
             ARM_ACCESS_KEY: $(STORAGE_KEY)
-        - script: |
-            cd $(TF_WORKING_DIR)
+        # - script: |
+        #     cd $(TF_WORKING_DIR)
             
-            # Create temporary tfvars file with required variables
-            cat <<EOF > terraform.tfvars
-            client_id = "$(client_id)"
-            client_secret = "$(client_secret)"
-            ssh_public_key = "$(CLEAN_KEY_PATH)"
-            EOF
+        #     # Create temporary tfvars file with required variables
+        #     cat <<EOF > terraform.tfvars
+        #     client_id = "$(client_id)"
+        #     client_secret = "$(client_secret)"
+        #     ssh_public_key = "$(CLEAN_KEY_PATH)"
+        #     EOF
             
-            echo "Temporary tfvars file contents:"
-            cat terraform.tfvars | sed 's/client_secret=.*/client_secret=***REDACTED***/'
+        #     echo "Temporary tfvars file contents:"
+        #     cat terraform.tfvars | sed 's/client_secret=.*/client_secret=***REDACTED***/'
             
-            # Conditional resource group import
-            echo "Attempting to import resource group..."
-            terraform import azurerm_resource_group.resource_group /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/kubepractise_dev || echo "Resource group import failed or already exists - continuing"
+        #     # Conditional resource group import
+        #     echo "Attempting to import resource group..."
+        #     terraform import azurerm_resource_group.resource_group /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/kubepractise_dev || echo "Resource group import failed or already exists - continuing"
             
-            # Conditional AKS cluster import
-            echo "Attempting to import AKS cluster..."
-            terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev || echo "AKS cluster import failed or already exists - continuing"
+        #     # Conditional AKS cluster import
+        #     echo "Attempting to import AKS cluster..."
+        #     terraform import azurerm_kubernetes_cluster.terraform-k8s /subscriptions/$(SUBSCRIPTION_ID)/resourceGroups/kubepractise_dev/providers/Microsoft.ContainerService/managedClusters/prodtest_dev || echo "AKS cluster import failed or already exists - continuing"
            
-            # Clean up temporary file
-            # rm terraform.tfvars
-            echo "Current state:"
-            terraform state list
-            displayName: 'Conditional Resource Import'
-          # displayName: 'Import Existing Resources'
-          env:
-            ARM_CLIENT_ID: $(client_id)
-            ARM_CLIENT_SECRET: $(client_secret)
-            ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
-            ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
-            ARM_ACCESS_KEY: $(STORAGE_KEY)
-        - script: terraform -chdir=$(TF_WORKING_DIR) state list
-          displayName: 'Verify Imported Resources'
+        #     # Clean up temporary file
+        #     # rm terraform.tfvars
+        #     echo "Current state:"
+        #     terraform state list
+        #     displayName: 'Conditional Resource Import'
+        #   # displayName: 'Import Existing Resources'
+        #   env:
+        #     ARM_CLIENT_ID: $(client_id)
+        #     ARM_CLIENT_SECRET: $(client_secret)
+        #     ARM_TENANT_ID: 4d143b55-605d-4af2-a581-12ee448bba20
+        #     ARM_SUBSCRIPTION_ID: fbccdf0c-3db4-454b-a6f3-0713e306b7f5
+        #     ARM_ACCESS_KEY: $(STORAGE_KEY)
+        # - script: terraform -chdir=$(TF_WORKING_DIR) state list
+        #   displayName: 'Verify Imported Resources'
   # - stage: Deploy
   #   jobs:
   #   - job: Apply
