@@ -48,7 +48,7 @@ spec:
               value: "30000"
             - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
               value: "5"
-            - name: AZURE_STORAGE_KEY
+            - name: AZURE_STORAGE_ACCOUNT-KEY
               valueFrom:
                 secretKeyRef:
                   name: azure-secrets
