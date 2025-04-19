@@ -38,7 +38,7 @@ export class ProductFormComponent {
     this.isUploading = true;
     this.uploadError = null;
 
-    this.productService.sendImage(file).subscribe({
+    this.productService.sendImage(file, this.productForm.value.category).subscribe({
       next: (response) =>{
         this.imageUrl = response;
         this.productForm.patchValue({imageUrl: this.imageUrl});

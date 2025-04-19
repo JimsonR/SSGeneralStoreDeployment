@@ -31,12 +31,12 @@ export class ProductService {
   }
 
   //Uploading an Image
-  sendImage(file : File) : Observable<string>{
+  sendImage(file : File, category:string) : Observable<string>{
 
     const formData = new FormData();
     formData.append('image', file);
 
-   return this._http.post<string>(`${this._url}/images/upload`, formData , {responseType:'text'as 'json'}).pipe(catchError(this.errorHandler))
+   return this._http.post<string>(`${this._url}/images/upload?category=${category}`, formData , {responseType:'text'as 'json'}).pipe(catchError(this.errorHandler))
   }
 
 
