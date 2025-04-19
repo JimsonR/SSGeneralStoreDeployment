@@ -19,7 +19,7 @@ export class ProductService {
 
   allProducts(): Observable<ProductModel[]>{
 
-    const url = `${this._url}/products/all`
+    const url = `${this._url}/products/all?pgNo=0&pgSize=100`
 
     return this._http.get<ProductModel[]>(url).pipe(catchError(this.errorHandler))
 
