@@ -67,7 +67,7 @@ public class ProductService {
 //    throw new RuntimeException();
 //}
 public String saveProduct(ProductRequest product) {
-  Products products = Products.builder().name(product.getName()).price(product.getPrice()+"").category(product.getCategory()).build();
+  Products products = Products.builder().name(product.getName()).price(product.getPrice()+"").category(product.getCategory()).imageUrl(product.getImageUrl()).build();
      productRepository.save(products);
      return "product added successfully";
 }
