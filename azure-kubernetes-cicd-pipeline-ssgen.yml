@@ -24,14 +24,14 @@ stages:
       vmImage: ubuntu-latest
       # name: Test Agent
     steps:
-      # - task: Docker@2
-      #   displayName: 'Build Backend Image'
-      #   inputs:
-      #     containerRegistry: 'jimson-docker-hub'
-      #     repository: 'jimsonrats/ssgenerals-backend'
-      #     command: 'buildAndPush'
-      #     Dockerfile: '**/Dockerfile.backend'
-      #     tags: '$(tag)'
+      - task: Docker@2
+        displayName: 'Build Backend Image'
+        inputs:
+          containerRegistry: 'jimson-docker-hub'
+          repository: 'jimsonrats/ssgenerals-backend'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile.backend'
+          tags: '$(tag)'
       - task: Docker@2
         displayName: 'Build Frontend Image'
         inputs:
@@ -112,15 +112,15 @@ stages:
     #     AZURE_STORAGE_KEY: $(AZURE_STORAGE_KEY)
     #     AZURE_COSMOS_KEY: $(AZURE_COSMOS_KEY)
 
-    # - task: KubernetesManifest@1
-    #   displayName: 'Deploy Backend'
-    #   inputs:
-    #     action: 'deploy'
-    #     connectionType: 'kubernetesServiceConnection'
-    #     kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
-    #     namespace: '$(k8sNamespace)'
-    #     manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
-    #     containers: '$(backendImage)'
+    - task: KubernetesManifest@1
+      displayName: 'Deploy Backend'
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'azure-kubernetes-ssgenerals-connenction'
+        namespace: '$(k8sNamespace)'
+        manifests: '$(System.ArtifactsDirectory)/manifests/backend-*.yaml'
+        containers: '$(backendImage)'
 
 
         # secretArguments: |
